@@ -24,11 +24,16 @@ connection.connect((err) => {
     }
 });
 
+// Cross Origin (DO NOT DELETE)
 app.use((req, res, next) => {
     res.header('Access-Control-Allow-Origin', '*');
     res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
     next();
-  });
+});
+
+// Allows us to parse json responses (DO NOT DELETE)  
+app.use(bodyParser.json());
+
 
 // About page 
 app.get('/about', (req, res) => {
@@ -47,13 +52,8 @@ app.get('/about', (req, res) => {
         }
     })
 });
-
-app.get('/.well-known/pki-validation/750CD67D9DF7A983428C9409A1EAEE93.txt', (req, res) => {
-    const filePath = path.join(__dirname, 'validation-file.txt');
-    res.sendFile(filePath);
-  });
   
-//   Returns all sponsors
+// Returns all sponsors
 app.get('/sponsors', (req, res) => {
     const query = 'SELECT * FROM SponsorCompany';
     connection.query(query,(queryError, result) => {
@@ -92,63 +92,61 @@ app.get('/applications', (req, res) => {
       res.json(results);
     });
   });
-  
-    app.use(bodyParser.json());
+       
+// Takes in a new user for the database  
+app.post('/users', (req, res) => {
+    const { USER_ID, USER_TYPE, EMAIL } = req.body;
     
-    app.post('/users', (req, res) => {
-        const { USER_ID, USER_TYPE, EMAIL } = req.body;
-      
-        // Check if required fields are provided
-        if (!USER_ID || !USER_TYPE || !EMAIL) {
-          return res.status(400).json({ error: 'Missing required fields' });
-        }
-      
-        // SQL query to insert data into the Users table
-        const sql = 'INSERT INTO Users (USER_ID, USER_TYPE, EMAIL) VALUES (?, ?, ?)';
-      
-        // Execute the query
-        connection.query(sql, [USER_ID, USER_TYPE, EMAIL], (error, results) => {
-          if (error) {
-            console.error('Error inserting user:', error);
-            return res.status(500).json({ error: 'Internal Server Error' });
-          }
-      
-          // Send a success response
-          res.json({ message: 'User added to the Users table successfully', result: results });
-        });
-      });
-      
-    // POST endpoint to add data to the Application table
-    app.post('/applications', (req, res) => {
-        const { userId, sponsorId, question1, question2 } = req.body;
-    
-        // Check if required fields are provided
-        if (!userId || !sponsorId || !question1 || !question2) {
+    // Check if required fields are provided
+    if (!USER_ID || !USER_TYPE || !EMAIL) {
         return res.status(400).json({ error: 'Missing required fields' });
-        }
+    }
     
-        // SQL query to insert data into the Application table
-        const sql = 'INSERT INTO Application (USER_ID, SPONSOR_ID, QUESTION_1, QUESTION_2) VALUES (?, ?, ?, ?)';
+    // SQL query to insert data into the Users table
+    const sql = 'INSERT INTO Users (USER_ID, USER_TYPE, EMAIL) VALUES (?, ?, ?)';
     
-        // Execute the query
-        connection.query(sql, [userId, sponsorId, question1, question2], (error, results) => {
+    // Execute the query
+    connection.query(sql, [USER_ID, USER_TYPE, EMAIL], (error, results) => {
         if (error) {
-            console.error('Error executing query:', error);
-            return res.status(500).json({ error: 'Internal Server Error' });
+        console.error('Error inserting user:', error);
+        return res.status(500).json({ error: 'Internal Server Error' });
         }
     
         // Send a success response
-        res.json({ message: 'Data added to the Application table successfully', result: results });
-        });
+        res.json({ message: 'User added to the Users table successfully', result: results });
     });
+});
+      
+// POST endpoint to add data to the Application table (NEED TO PROTECT AGAINST SQL INJECTION)
+app.post('/applications', (req, res) => {
+    const { userId, sponsorId, question1, question2 } = req.body;
 
-// Define a route
+    // Check if required fields are provided
+    if (!userId || !sponsorId || !question1 || !question2) {
+    return res.status(400).json({ error: 'Missing required fields' });
+    }
+
+    // SQL query to insert data into the Application table
+    const sql = 'INSERT INTO Application (USER_ID, SPONSOR_ID, QUESTION_1, QUESTION_2) VALUES (?, ?, ?, ?)';
+
+    // Execute the query
+    connection.query(sql, [userId, sponsorId, question1, question2], (error, results) => {
+    if (error) {
+        console.error('Error executing query:', error);
+        return res.status(500).json({ error: 'Internal Server Error' });
+    }
+
+    // Send a success response
+    res.json({ message: 'Data added to the Application table successfully', result: results });
+    });
+});
+
+// HOME PAGE 
 app.get('/', (req, res) => {
   res.send('Hello, Express!');
 });
 
 // Start the server
 app.listen(port, () => {
-
   console.log(`Server is running on http://localhost:${port}`);
 });
