@@ -1,0 +1,154 @@
+const express = require('express');
+const app = express();
+const mysql = require('mysql');
+const path = require('path');
+const bodyParser = require('body-parser');
+const port = process.env.PORT || 3000;
+
+
+// Configuring database connection
+const connection = mysql.createConnection({
+    host: process.env.RDS_HOSTNAME,
+    user: process.env.RDS_USERNAME,
+    password: process.env.RDS_PASSWORD,
+    database: process.env.RDS_DB_NAME,
+    port: process.env.RDS_PORT,
+});
+
+// Connecting to database
+connection.connect((err) => {
+    if (err) {
+        console.error('Database connection failed:', err);
+    } else {
+        console.log('Connected to the database');
+    }
+});
+
+app.use((req, res, next) => {
+    res.header('Access-Control-Allow-Origin', '*');
+    res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
+    next();
+  });
+
+// About page 
+app.get('/about', (req, res) => {
+    // Gets all entries from about table, then orders them in ascending order
+    const query = 'SELECT * FROM About ORDER BY SPRINT_NUM DESC LIMIT 1';
+    connection.query(query,(queryError, result) => {
+        if (queryError) {
+            console.error('Error executing query:', queryErr);
+            res.status(500).json({ error: 'Internal Server Error' });
+            return;
+        } else {
+            // Result will contain the most recent entry
+            const newestPrimaryKey = result[0].SPRINT_NUM;
+            res.status(200).json(result[0]);
+            return;
+        }
+    })
+});
+
+app.get('/.well-known/pki-validation/750CD67D9DF7A983428C9409A1EAEE93.txt', (req, res) => {
+    const filePath = path.join(__dirname, 'validation-file.txt');
+    res.sendFile(filePath);
+  });
+  
+//   Returns all sponsors
+app.get('/sponsors', (req, res) => {
+    const query = 'SELECT * FROM SponsorCompany';
+    connection.query(query,(queryError, result) => {
+        if (queryError) {
+            console.error('Error executing query:', queryErr);
+            res.status(500).json({ error: 'Internal Server Error' });
+            return;
+        } else {
+            // Result will contain the most recent entry
+            res.status(200).json(result);
+            return;
+        }
+    })
+});
+
+// Returns all applications with an associated sponsor
+app.get('/applications', (req, res) => {
+    const { sponsorID } = req.query;
+  
+    // Check if sponsorID is provided
+    if (!sponsorID) {
+      return res.status(400).json({ error: 'Missing sponsorID parameter' });
+    }
+  
+    // SQL query to retrieve applications based on sponsorID
+    const sql = 'SELECT * FROM Application WHERE SPONSOR_ID = ?';
+  
+    // Execute the query
+    connection.query(sql, [sponsorID], (error, results) => {
+      if (error) {
+        console.error('Error executing query:', error);
+        return res.status(500).json({ error: 'Internal Server Error' });
+      }
+  
+      // Send the results as JSON response
+      res.json(results);
+    });
+  });
+  
+    app.use(bodyParser.json());
+    
+    app.post('/users', (req, res) => {
+        const { USER_ID, USER_TYPE, EMAIL } = req.body;
+      
+        // Check if required fields are provided
+        if (!USER_ID || !USER_TYPE || !EMAIL) {
+          return res.status(400).json({ error: 'Missing required fields' });
+        }
+      
+        // SQL query to insert data into the Users table
+        const sql = 'INSERT INTO Users (USER_ID, USER_TYPE, EMAIL) VALUES (?, ?, ?)';
+      
+        // Execute the query
+        connection.query(sql, [USER_ID, USER_TYPE, EMAIL], (error, results) => {
+          if (error) {
+            console.error('Error inserting user:', error);
+            return res.status(500).json({ error: 'Internal Server Error' });
+          }
+      
+          // Send a success response
+          res.json({ message: 'User added to the Users table successfully', result: results });
+        });
+      });
+      
+    // POST endpoint to add data to the Application table
+    app.post('/applications', (req, res) => {
+        const { userId, sponsorId, question1, question2 } = req.body;
+    
+        // Check if required fields are provided
+        if (!userId || !sponsorId || !question1 || !question2) {
+        return res.status(400).json({ error: 'Missing required fields' });
+        }
+    
+        // SQL query to insert data into the Application table
+        const sql = 'INSERT INTO Application (USER_ID, SPONSOR_ID, QUESTION_1, QUESTION_2) VALUES (?, ?, ?, ?)';
+    
+        // Execute the query
+        connection.query(sql, [userId, sponsorId, question1, question2], (error, results) => {
+        if (error) {
+            console.error('Error executing query:', error);
+            return res.status(500).json({ error: 'Internal Server Error' });
+        }
+    
+        // Send a success response
+        res.json({ message: 'Data added to the Application table successfully', result: results });
+        });
+    });
+
+// Define a route
+app.get('/', (req, res) => {
+  res.send('Hello, Express!');
+});
+
+// Start the server
+app.listen(port, () => {
+
+  console.log(`Server is running on http://localhost:${port}`);
+});
