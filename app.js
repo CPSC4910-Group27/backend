@@ -141,6 +141,46 @@ app.post('/applications', (req, res) => {
     });
 });
 
+// Takes in a new driver for database
+app.post('/drivers', (req, res) => {
+    const { USER_ID, SPONSOR_ID } = req.body;
+
+    // Check if required fields are provided
+    if (!USER_ID || !SPONSOR_ID) {
+        return res.status(400).json({ error: 'Missing required fields' });
+    }
+
+    // Query to get the most recent driverId
+    const getDriverIdQuery = 'SELECT MAX(DRIVER_ID) AS MAX_DRIVER_ID FROM Drivers';
+
+    // Execute query to get the most recent driverId
+    connection.query(getDriverIdQuery, (error, results) => {
+        if (error) {
+            console.error('Error getting max driver ID:', error);
+            return res.status(500).json({ error: 'Internal Server Error' });
+        }
+
+        let NEW_DRIVER_ID = 1; // Default to 1 if no drivers exist yet
+        if (results[0].MAX_DRIVER_ID) {
+            NEW_DRIVER_ID = results[0].MAX_DRIVER_ID + 1; // Increment driverId
+        }
+
+        // SQL query to insert data into the Drivers table
+        const insertDriverQuery = 'INSERT INTO Drivers (DRIVER_ID, USER_ID, SPONSOR_ID, POINTS) VALUES (?, ?, ?, ?)';
+
+        // Execute the query
+        connection.query(insertDriverQuery, [NEW_DRIVER_ID, USER_ID, SPONSOR_ID, 0], (error, results) => {
+            if (error) {
+                console.error('Error inserting driver:', error);
+                return res.status(500).json({ error: 'Internal Server Error' });
+            }
+
+            // Send a success response
+            res.json({ message: 'Driver added to the Drivers table successfully', result: results });
+        });
+    });
+});
+
 // HOME PAGE 
 app.get('/', (req, res) => {
   res.send('Hello, Express!');
