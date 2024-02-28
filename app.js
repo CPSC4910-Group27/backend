@@ -154,7 +154,7 @@ app.post('/drivers', (req, res) => {
     let sql = 'SELECT MAX(DRIVER_ID) AS MAX_DRIVER_ID FROM Drivers';
     connection.query(sql, (error, results) => {
         if (error) {
-            console.error('Error retrieving max driverId:', error);
+            console.error('Error retrieving max driver ID:', error);
             return res.status(500).json({ error: 'Internal Server Error' });
         }
         
