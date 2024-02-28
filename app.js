@@ -150,7 +150,7 @@ app.post('/drivers', (req, res) => {
         return res.status(400).json({ error: 'Missing required fields' });
     }
     
-    // Increment the driver ID based on the most recent driverId
+    // Increment the driver ID based on the most recent driver ID
     let sql = 'SELECT MAX(DRIVER_ID) AS MAX_DRIVER_ID FROM Drivers';
     connection.query(sql, (error, results) => {
         if (error) {
@@ -185,7 +185,7 @@ app.post('/drivers', (req, res) => {
 
 // Update a driver's information
 app.patch('/drivers/:DRIVER_ID', (req, res) => {
-    const DRIVER_ID = req.params.driverId;
+    const DRIVER_ID = req.params.DRIVER_ID;
     const { SPONSOR_ID, POINTS } = req.query;
     
     // Check if at least one field is provided for update
