@@ -138,51 +138,35 @@ app.post('/applications', (req, res) => {
     });
 });
 
-// Takes in a new driver for database, sponsor and points will be initially empty
+// Takes in a new driver for database
 app.post('/drivers', (req, res) => {
-    const { USER_ID } = req.body;
-    
+    const { USER_ID, SPONSOR_ID } = req.body;
+
     // Check if required fields are provided
-    if (!USER_ID) {
+    if (!USER_ID || !SPONSOR_ID) {
         return res.status(400).json({ error: 'Missing required fields' });
     }
-    
-    // Increment the driver ID based on the most recent driver ID
-    let sql = 'SELECT MAX(DRIVER_ID) AS MAX_DRIVER_ID FROM Drivers';
-    connection.query(sql, (error, results) => {
+
+    // Initialize points to 0
+    const points = 0;
+
+    // SQL query to insert data into the Drivers table
+    const sql = 'INSERT INTO Drivers (USER_ID, SPONSOR_ID, POINTS) VALUES (?, ?, ?)';
+
+    // Execute the query
+    connection.query(sql, [USER_ID, SPONSOR_ID, points], (error, results) => {
         if (error) {
-            console.error('Error retrieving max driver ID:', error);
+            console.error('Error executing query:', error);
             return res.status(500).json({ error: 'Internal Server Error' });
         }
-        
-        let MAX_DRIVER_ID = results[0].MAX_DRIVER_ID || 0;
-        const DRIVER_ID = MAX_DRIVER_ID + 1;
-        
-        // Initialize sponsor ID to null
-        const SPONSOR_ID = null;
-        
-        // Initialize points to 0
-        const POINTS = 0;
-        
-        // SQL query to insert data into the Drivers table
-        sql = 'INSERT INTO Drivers (DRIVER_ID, USER_ID, SPONSOR_ID, POINTS) VALUES (?, ?, ?, ?)';
-        
-        // Execute the query
-        connection.query(sql, [DRIVER_ID, USER_ID, SPONSOR_ID, POINTS], (error, results) => {
-            if (error) {
-                console.error('Error inserting driver:', error);
-                return res.status(500).json({ error: 'Internal Server Error' });
-            }
-            
-            // Send a success response
-            res.json({ message: 'Driver added to the Drivers table successfully', result: results });
-        });
+
+        // Send a success response
+        res.json({ message: 'Driver added to the Drivers table successfully', result: results });
     });
 });
 
 // Update a driver's information
-app.patch('/drivers/:DRIVER_ID', (req, res) => {
-    const DRIVER_ID = req.params.DRIVER_ID;
+app.patch('/drivers/:USER_ID', (req, res) => {
     const { SPONSOR_ID, POINTS } = req.query;
     
     // Check if at least one field is provided for update
@@ -201,12 +185,13 @@ app.patch('/drivers/:DRIVER_ID', (req, res) => {
         setClause += 'POINTS = ?, ';
         values.push(POINTS);
     }
+
     // Remove trailing comma and space from SET clause
     setClause = setClause.slice(0, -2);
     
     // SQL query to update driver's information
-    const sql = `UPDATE Drivers SET ${setClause} WHERE DRIVER_ID = ?`;
-    values.push(DRIVER_ID);
+    const sql = `UPDATE Drivers SET ${setClause} WHERE USER_ID = ?`;
+    values.push(USER_ID);
     
     // Execute the query
     connection.query(sql, values, (error, results) => {
