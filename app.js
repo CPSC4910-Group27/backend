@@ -1,10 +1,8 @@
 const express = require('express');
 const app = express();
 const mysql = require('mysql');
-const path = require('path');
 const bodyParser = require('body-parser');
 const port = process.env.PORT || 3000;
-
 
 // Configuring database connection
 const connection = mysql.createConnection({
@@ -34,7 +32,6 @@ app.use((req, res, next) => {
 // Allows us to parse json responses (DO NOT DELETE)  
 app.use(bodyParser.json());
 
-
 // About page 
 app.get('/about', (req, res) => {
     // Gets all entries from about table, then orders them in ascending order
@@ -52,7 +49,7 @@ app.get('/about', (req, res) => {
         }
     })
 });
-  
+
 // Returns all sponsors
 app.get('/sponsors', (req, res) => {
     const query = 'SELECT * FROM SponsorCompany';
@@ -92,7 +89,7 @@ app.get('/applications', (req, res) => {
       res.json(results);
     });
   });
-       
+
 // Takes in a new user for the database  
 app.post('/users', (req, res) => {
     const { USER_ID, USER_TYPE, EMAIL } = req.body;
