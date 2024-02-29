@@ -164,12 +164,13 @@ app.post('/drivers', (req, res) => {
         }
 
         // Send a success response
-        res.json({ message: 'Driver added to the Drivers table successfully', result: results });
+        res.json({ message: 'Driver added to the Drivers table successfully'});
     });
 });
 
 // Update a driver's information
 app.patch('/drivers/:USER_ID', (req, res) => {
+    const USER_ID = req.params.USER_ID;
     const { SPONSOR_ID, POINTS } = req.query;
     
     // Check if at least one field is provided for update
@@ -208,7 +209,7 @@ app.patch('/drivers/:USER_ID', (req, res) => {
         }
         
         // Send a success response
-        res.json({ message: 'Driver information updated successfully', result: results });
+        res.json({ message: 'Driver information updated successfully'});
     });
 });
 
