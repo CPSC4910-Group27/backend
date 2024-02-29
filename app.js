@@ -140,12 +140,15 @@ app.post('/applications', (req, res) => {
 
 // Takes in a new driver for database
 app.post('/drivers', (req, res) => {
-    const { USER_ID, SPONSOR_ID } = req.body;
+    const { USER_ID } = req.body;
 
     // Check if required fields are provided
-    if (!USER_ID || !SPONSOR_ID) {
+    if (!USER_ID) {
         return res.status(400).json({ error: 'Missing required fields' });
     }
+
+    // Set sponsor ID to null by default
+    const SPONSOR_ID = null;
 
     // Initialize points to 0
     const points = 0;
