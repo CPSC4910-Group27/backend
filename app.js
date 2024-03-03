@@ -213,6 +213,46 @@ app.patch('/drivers/:USER_ID', (req, res) => {
     });
 });
 
+// Takes in a new sponsor to Sponsors table
+app.post('/sponsors', (req, res) => {
+    const { SPONSOR_ADMIN_ID, USER_ID } = req.body; // Assuming you have SPONSOR_ADMIN_ID and USER_ID in the request body
+
+    // Check if required fields are provided
+    if (!SPONSOR_ADMIN_ID || !USER_ID) {
+        return res.status(400).json({ error: 'Missing required fields' });
+    }
+
+    // SQL query to fetch sponsorId based on admin's userId
+    const sponsorIDQuery = 'SELECT SPONSOR_ID FROM Sponsors WHERE USER_ID = ?';
+
+    // Execute the query
+    connection.query(sponsorIDQuery, [SPONSOR_ADMIN_ID], (error, results) => {
+        if (error) {
+            console.error('Error fetching sponsor ID:', error);
+            return res.status(500).json({ error: 'Internal Server Error' });
+        }
+
+        if (results.length === 0) {
+            return res.status(404).json({ error: 'Sponsor admin not found' });
+        }
+
+        const sponsorId = results[0].sponsorId;
+
+        // SQL query to insert data into the Sponsors table
+        const insertSponsorQuery = 'INSERT INTO Sponsors (USER_ID, SPONSOR_ID) VALUES (?, ?)';
+
+        // Execute the query to insert new sponsor
+        connection.query(insertSponsorQuery, [USER_ID, sponsorId], (error, insertResults) => {
+            if (error) {
+                console.error('Error inserting sponsor:', error);
+                return res.status(500).json({ error: 'Internal Server Error' });
+            }
+
+            res.json({ message: 'Sponsor account created successfully', result: insertResults });
+        });
+    });
+});
+
 // HOME PAGE 
 app.get('/', (req, res) => {
   res.send('Hello, Express!');
