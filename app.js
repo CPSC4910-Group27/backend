@@ -66,28 +66,58 @@ app.get('/sponsors', (req, res) => {
     })
 });
 
-// Returns all applications with an associated sponsor
-app.get('/applications', (req, res) => {
-    const { sponsorID } = req.query;
+// return all sponsor users
+app.get('/sponsorusers/all', async (req, res) => {
+    try {
+      const { rows } = await pool.query('SELECT * FROM Sponsors');
+      res.json(rows);
+    } catch (error) {
+      console.error('Error fetching sponsors:', error);
+      res.status(500).json({ error: 'Internal server error' });
+    }
+  });
   
-    // Check if sponsorID is provided
+  // get sponsor users based on sponsor ID
+  app.get('/sponsorusers', async (req, res) => {
+    const sponsorID = req.query.sponsorID;
     if (!sponsorID) {
-      return res.status(400).json({ error: 'Missing sponsorID parameter' });
+      return res.status(400).json({ error: 'Missing SPONSOR_ID parameter' });
     }
   
-    // SQL query to retrieve applications based on sponsorID
-    const sql = 'SELECT * FROM Application WHERE SPONSOR_ID = ?';
+    try {
+      const { rows } = await pool.query('SELECT * FROM Sponsors WHERE SPONSOR_ID = $1', [sponsorID]);
+      res.json(rows);
+    } catch (error) {
+      console.error('Error fetching sponsors:', error);
+      res.status(500).json({ error: 'Internal server error' });
+    }
+  });
   
-    // Execute the query
-    connection.query(sql, [sponsorID], (error, results) => {
-      if (error) {
-        console.error('Error executing query:', error);
-        return res.status(500).json({ error: 'Internal Server Error' });
-      }
+  // get all drivers
+  app.get('/drivers', async (req, res) => {
+    try {
+      const { rows } = await pool.query('SELECT * FROM Drivers');
+      res.json(rows);
+    } catch (error) {
+      console.error('Error fetching drivers:', error);
+      res.status(500).json({ error: 'Internal server error' });
+    }
+  });
   
-      // Send the results as JSON response
-      res.json(results);
-    });
+  // get all applications associated with a sponsor
+  app.get('/applications', async (req, res) => {
+    const sponsorID = req.query.sponsorID;
+    if (!sponsorID) {
+      return res.status(400).json({ error: 'Missing SPONSOR_ID parameter' });
+    }
+  
+    try {
+      const { rows } = await pool.query('SELECT * FROM Application WHERE SPONSOR_ID = $1', [sponsorID]);
+      res.json(rows);
+    } catch (error) {
+      console.error('Error fetching applications:', error);
+      res.status(500).json({ error: 'Internal server error' });
+    }
   });
 
 // Takes in a new user for the database  
