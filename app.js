@@ -66,7 +66,7 @@ app.get('/sponsors', (req, res) => {
     })
 });
 
-// return all sponsor users
+// return all sponsor users 
 app.get('/sponsorusers/all', async (req, res) => {
     try {
       const { rows } = await pool.query('SELECT * FROM Sponsors');
