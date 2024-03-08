@@ -96,9 +96,10 @@ app.get('/sponsorusers/all', async (req, res) => {
   // get all drivers
   app.get('/drivers', async (req, res) => {
     try {
-      const { rows } = await connection.query('SELECT * FROM Drivers');
-      res.status(200).json(rows);
-      return;
+        query = 'SELECT * FROM Drivers';
+        await connection.query(query,rows);
+        res.status(200).json(rows);
+        return;
     } catch (error) {
       console.error('Error fetching drivers:', error);
       res.status(500).json({ error: 'Internal server error' });
