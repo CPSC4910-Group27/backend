@@ -189,7 +189,7 @@ app.post('/drivers', (req, res) => {
     const points = 0;
 
     // SQL query to insert data into the Drivers table
-    const sql = 'INSERT INTO Drivers (USER_ID, SPONSOR_ID, POINTS) VALUES (?, ?, ?)';
+    const sql = 'INSERT INTO Drivers (USER_ID) VALUES (?)';
 
     // Execute the query
     connection.query(sql, [USER_ID, SPONSOR_ID, points], (error, results) => {
