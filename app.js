@@ -175,21 +175,15 @@ app.post('/applications', (req, res) => {
 
 // Takes in a new driver for database
 app.post('/drivers', (req, res) => {
-    const { USER_ID } = req.body;
+    const { DRIVER_ID } = req.body;
 
     // Check if required fields are provided
-    if (!USER_ID) {
+    if (!DRIVER_ID) {
         return res.status(400).json({ error: 'Missing required fields' });
     }
 
-    // Set sponsor ID to null by default
-    const SPONSOR_ID = null;
-
-    // Initialize points to 0
-    const points = 0;
-
     // SQL query to insert data into the Drivers table
-    const sql = 'INSERT INTO Drivers (USER_ID) VALUES (?)';
+    const sql = 'INSERT INTO Drivers (DRIVER_ID) VALUES (?)';
 
     // Execute the query
     connection.query(sql, [USER_ID, SPONSOR_ID, points], (error, results) => {
