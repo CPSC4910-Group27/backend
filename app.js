@@ -50,6 +50,8 @@ app.get('/about', (req, res) => {
     })
 });
 
+const jwt = require('jsonwebtoken');
+
 // Return current user information
 app.get('/user', (req, res) => {
     const token = req.headers.authorization;
