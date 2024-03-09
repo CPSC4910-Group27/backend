@@ -141,7 +141,7 @@ app.get('/applications', async (req, res) => {
     const sponsorID = req.query.sponsorID;
     // RETURN ALL APPLICATIONS
     if (!sponsorID) {
-        query = 'SELECT * FROM SponsorApplications';
+        query = 'SELECT * FROM Application';
         connection.query(query,(queryError, result)=> {
             if(queryError){
                 console.error('Error fetching applications:', queryError);
@@ -156,7 +156,7 @@ app.get('/applications', async (req, res) => {
     }
     else{
         // RETURNS ALL APPLICATIONs ASSOCIATED WITH SPECIFIC SPONSOR
-        query = 'SELECT * FROM SponsorApplications WHERE SPONSOR_ID = ' + sponsorID.toString();
+        query = 'SELECT * FROM Application WHERE SPONSOR_ID = ' + sponsorID.toString();
         connection.query(query,(queryError, result)=> {
             if(queryError){
                 console.error('Error fetching application associated with ${sponsorID}:', queryError);
