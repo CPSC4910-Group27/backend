@@ -95,7 +95,9 @@ app.get('/sponsorusers/all', async (req, res) => {
   
   // get all drivers
   app.get('/drivers', async (req, res) => {
-    
+    const sponsorID = req.query.sponsorID;
+    // RETURN ALL DRIVERS
+    if (!sponsorID) {
         query = 'SELECT * FROM Drivers';
         connection.query(query,(queryError, result)=> {
             if(queryError){
@@ -108,7 +110,22 @@ app.get('/sponsorusers/all', async (req, res) => {
                 return;
             }
         });
-  });
+    }
+
+    // RETURNS ALL DRIVERs ASSOCIATED WITH SPECIFIC SPONSOR
+    query = 'SELECT * FROM Application WHERE SPONSOR_ID = ${sponsorID}';
+    connection.query(query,(queryError, result)=> {
+        if(queryError){
+            console.error('Error fetching drivers associted with ${sponsorID}:', error);
+            res.status(500).json({ error: 'Internal server error' });
+            return;
+        }
+        else{
+            res.status(200).json(result);
+            return;
+        }
+    });
+});
   
   // get all applications associated with a sponsor
   app.get('/applications', async (req, res) => {
