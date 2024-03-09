@@ -113,7 +113,7 @@ app.get('/sponsorusers/all', async (req, res) => {
     }
 
     // RETURNS ALL DRIVERs ASSOCIATED WITH SPECIFIC SPONSOR
-    query = 'SELECT * FROM Application WHERE SPONSOR_ID = ${sponsorID}';
+    query = 'SELECT * FROM DriverSponsorships WHERE SPONSOR_ID = ${sponsorID}';
     connection.query(query,(queryError, result)=> {
         if(queryError){
             console.error('Error fetching drivers associted with ${sponsorID}:', error);
