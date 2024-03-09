@@ -66,39 +66,47 @@ app.get('/sponsors', (req, res) => {
     })
 });
 
-// return all sponsor users
-app.get('/sponsorusers/all', async (req, res) => {
-    try {
-      const { rows } = await pool.query('SELECT * FROM Sponsors');
-      res.json(rows);
-    } catch (error) {
-      console.error('Error fetching sponsors:', error);
-      res.status(500).json({ error: 'Internal server error' });
-    }
-  });
-  
-  // get sponsor users based on sponsor ID
-  app.get('/sponsorusers', async (req, res) => {
+// get all sponsor users
+app.get('/sponsorusers', async (req, res) => {
     const sponsorID = req.query.sponsorID;
+    // RETURN ALL SPONSORS
     if (!sponsorID) {
-      return res.status(400).json({ error: 'Missing SPONSOR_ID parameter' });
+        query = 'SELECT * FROM Sponsors';
+        connection.query(query,(queryError, result)=> {
+            if(queryError){
+                console.error('Error fetching sponsors:', queryError);
+                res.status(500).json({ error: 'Internal server error' });
+                return;
+            }
+            else{
+                res.status(200).json(result);
+                return;
+            }
+        });
     }
-  
-    try {
-      const { rows } = await connection.query('SELECT * FROM Sponsors WHERE SPONSOR_ID = $1', [sponsorID]);
-      res.json(rows);
-    } catch (error) {
-      console.error('Error fetching sponsors:', error);
-      res.status(500).json({ error: 'Internal server error' });
+    else{
+        // RETURNS ALL SPONSORs ASSOCIATED WITH SPECIFIC SPONSOR
+        query = 'SELECT * FROM Sponsors WHERE SPONSOR_ID = ' + sponsorID.toString();
+        connection.query(query,(queryError, result)=> {
+            if(queryError){
+                console.error('Error fetching sponsors associated with ${sponsorID}:', queryError);
+                res.status(500).json({ error: 'Internal server error' });
+                return;
+            }
+            else{
+                res.status(200).json(result);
+                return;
+            }
+        });
     }
-  });
+});
   
-  // get all drivers
+// get all drivers
 app.get('/drivers', async (req, res) => {
     const sponsorID = req.query.sponsorID;
     // RETURN ALL DRIVERS
     if (!sponsorID) {
-        query = 'SELECT * FROM Drivers';
+        query = 'SELECT * FROM DriverSponsorships';
         connection.query(query,(queryError, result)=> {
             if(queryError){
                 console.error('Error fetching drivers:', queryError);
@@ -116,7 +124,7 @@ app.get('/drivers', async (req, res) => {
         query = 'SELECT * FROM DriverSponsorships WHERE SPONSOR_ID = ' + sponsorID.toString();
         connection.query(query,(queryError, result)=> {
             if(queryError){
-                console.error('Error fetching drivers associted with ${sponsorID}:', queryError);
+                console.error('Error fetching drivers associated with ${sponsorID}:', queryError);
                 res.status(500).json({ error: 'Internal server error' });
                 return;
             }
@@ -127,24 +135,41 @@ app.get('/drivers', async (req, res) => {
         });
     }
 });
-  
-  // get all applications associated with a sponsor
-  app.get('/applications', async (req, res) => {
+
+// get all sponsor applications
+app.get('/applications', async (req, res) => {
     const sponsorID = req.query.sponsorID;
+    // RETURN ALL APPLICATIONS
     if (!sponsorID) {
-      return res.status(400).json({ error: 'Missing SPONSOR_ID parameter' });
+        query = 'SELECT * FROM SponsorApplications';
+        connection.query(query,(queryError, result)=> {
+            if(queryError){
+                console.error('Error fetching applications:', queryError);
+                res.status(500).json({ error: 'Internal server error' });
+                return;
+            }
+            else{
+                res.status(200).json(result);
+                return;
+            }
+        });
     }
-  
-    try {
-      const { rows } = await pool.query('SELECT * FROM Application WHERE SPONSOR_ID = $1', [sponsorID]);
-      res.json(rows);
-      return;
-    } catch (error) {
-      console.error('Error fetching applications:', error);
-      res.status(500).json({ error: 'Internal server error' });
-      return;
+    else{
+        // RETURNS ALL APPLICATIONs ASSOCIATED WITH SPECIFIC SPONSOR
+        query = 'SELECT * FROM SponsorApplications WHERE SPONSOR_ID = ' + sponsorID.toString();
+        connection.query(query,(queryError, result)=> {
+            if(queryError){
+                console.error('Error fetching application associated with ${sponsorID}:', queryError);
+                res.status(500).json({ error: 'Internal server error' });
+                return;
+            }
+            else{
+                res.status(200).json(result);
+                return;
+            }
+        });
     }
-  });
+});
 
 // Takes in a new user for the database  
 app.post('/users', (req, res) => {
