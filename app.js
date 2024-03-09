@@ -50,6 +50,28 @@ app.get('/about', (req, res) => {
     })
 });
 
+// Return current user information
+app.get('/user', (req, res) => {
+    const token = req.headers.authorization;
+
+    if (!token) {
+        return res.status(401).json({ error: 'Authorization token not provided' });
+    }
+
+    jwt.verify(token, process.env.JWT_SECRET, (err, decoded) => {
+        if (err) {
+            console.error('Error decoding token:', err);
+            return res.status(401).json({ error: 'Invalid token' });
+        }
+
+        const { sub: userId, userType, email} = decoded;
+
+        // Respond with user information
+        res.status(200).json({ userId, userType, email});
+    });
+});
+
+
 // Returns all sponsors
 app.get('/sponsors', (req, res) => {
     const query = 'SELECT * FROM SponsorCompany';
