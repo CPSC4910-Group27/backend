@@ -203,10 +203,10 @@ app.post('/users', (req, res) => {
     }
     
     // SQL query to insert data into the Users table
-    const sql = 'INSERT INTO Users , USER_TYPE, EMAIL) VALUES (?, ?, ?)';
+    const sql = 'INSERT INTO Users USER_TYPE, EMAIL, USERNAME) VALUES (?, ?, ?)';
     
     // Execute the query
-    connection.query(sql, [USER_ID, USER_TYPE, EMAIL], (error, results) => {
+    connection.query(sql, [USER_TYPE, EMAIL, USERNAME], (error, results) => {
         if (error) {
         console.error('Error inserting user:', error);
         return res.status(500).json({ error: 'Internal Server Error' });
