@@ -195,15 +195,15 @@ app.get('/applications', async (req, res) => {
 
 // Takes in a new user for the database  
 app.post('/users', (req, res) => {
-    const { USER_ID, USER_TYPE, EMAIL } = req.body;
-    
+    const {USER_TYPE, EMAIL, USERNAME} = req.body;
+
     // Check if required fields are provided
-    if (!USER_ID || !USER_TYPE || !EMAIL) {
+    if (!USER_TYPE|| !EMAIL || !USERNAME) {
         return res.status(400).json({ error: 'Missing required fields' });
     }
     
     // SQL query to insert data into the Users table
-    const sql = 'INSERT INTO Users (USER_ID, USER_TYPE, EMAIL) VALUES (?, ?, ?)';
+    const sql = 'INSERT INTO Users , USER_TYPE, EMAIL) VALUES (?, ?, ?)';
     
     // Execute the query
     connection.query(sql, [USER_ID, USER_TYPE, EMAIL], (error, results) => {
