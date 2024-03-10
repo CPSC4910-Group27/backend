@@ -50,27 +50,28 @@ app.get('/about', (req, res) => {
     })
 });
 
-// Return current user information
-app.get('/user', (req, res) => {
-    const token = req.headers.authorization;
-
-    if (!token) {
-        return res.status(401).json({ error: 'Authorization token not provided' });
+// Gets all users or certain user based on username given
+app.get('/users', (req, res) => {
+    const username = req.query.USERNAME;
+    if (!username) {
+        query = 'SELECT * FROM USERS'
     }
-
-    jwt.verify(token, process.env.JWT_SECRET, (err, decoded) => {
-        if (err) {
-            console.error('Error decoding token:', err);
-            return res.status(401).json({ error: 'Invalid token' });
+    else
+    {
+        query = 'SELECT * FROM USERS WHERE USERNAME = ' + username.toString();
+    }
+    connection.query(query,(queryError, result) => {
+        if (queryError) {
+            console.error('Error executing query:', queryError);
+            res.status(500).json({ error: 'Internal Server Error' });
+            return;
+        } else {
+            // Result will contain the most recent entry
+            res.status(200).json(result);
+            return;
         }
-
-        const { sub: userId, userType, email} = decoded;
-
-        // Respond with user information
-        res.status(200).json({ userId, userType, email});
     });
 });
-
 
 // Returns all sponsors
 app.get('/sponsors', (req, res) => {
