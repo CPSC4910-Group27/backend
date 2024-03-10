@@ -54,11 +54,11 @@ app.get('/about', (req, res) => {
 app.get('/users', (req, res) => {
     const username = req.query.USERNAME;
     if (!username) {
-        query = 'SELECT * FROM USERS'
+        query = 'SELECT * FROM Users'
     }
     else
     {
-        query = 'SELECT * FROM USERS WHERE USERNAME = ' + username.toString();
+        query = 'SELECT * FROM Users WHERE USERNAME = ' + username.toString();
     }
     connection.query(query,(queryError, result) => {
         if (queryError) {
