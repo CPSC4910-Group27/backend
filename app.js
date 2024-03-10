@@ -203,7 +203,7 @@ app.post('/users', (req, res) => {
     }
     
     // SQL query to insert data into the Users table
-    const sql = 'INSERT INTO Users USER_TYPE, EMAIL, USERNAME) VALUES (?, ?, ?)';
+    const sql = 'INSERT INTO Users (USER_TYPE, EMAIL, USERNAME) VALUES (?, ?, ?)';
     
     // Execute the query
     connection.query(sql, [USER_TYPE, EMAIL, USERNAME], (error, results) => {
