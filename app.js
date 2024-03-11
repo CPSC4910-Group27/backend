@@ -321,7 +321,7 @@ app.post('/drivers', (req, res) => {
 });
 
 // Updates a users information and assigns them to the correct table
-app.patch('/users/:USER_ID'),(req,res) =>{
+app.patch('/users/:USER_ID',(req,res) =>{
     const USER_ID = req.params.USER_ID;
     const {SPONSOR_ID, USER_TYPE} = req.body;
     if(USER_ID === undefined)
@@ -358,7 +358,7 @@ app.patch('/users/:USER_ID'),(req,res) =>{
             return res.status(200).json({ message: 'User and Sponsor updated successfully' });
         }
     });
-}
+});
 
 // Update a driver's information
 app.patch('/drivers/:USER_ID', (req, res) => {
