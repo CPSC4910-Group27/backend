@@ -320,7 +320,7 @@ app.post('/drivers', (req, res) => {
     });
 });
 
-// Updates a users information and assigns them to the correct table
+// Updates a users information and assigns them to the sponsors table
 app.patch('/users/:USER_ID',(req,res) =>{
     const USER_ID = req.params.USER_ID;
     const {SPONSOR_ID, USER_TYPE} = req.body;
