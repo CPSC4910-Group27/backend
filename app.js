@@ -65,7 +65,13 @@ app.get('/users', (req, res) => {
             console.error('Error executing query:', queryError);
             res.status(500).json({ error: 'Internal Server Error' });
             return;
-        } else {
+        } 
+        else if(!username)
+        {
+            res.status(200).json(result);
+        }
+         
+        else {
             // Result will contain the most recent entry
             res.status(200).json(result[0]);
             return;
