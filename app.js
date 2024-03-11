@@ -363,7 +363,7 @@ app.patch('/users/:USER_ID'),(req,res) =>{
 // Update a driver's information
 app.patch('/drivers/:USER_ID', (req, res) => {
     const USER_ID = req.params.USER_ID;
-    const { SPONSOR_ID, POINTS } = req.query;
+    const { SPONSOR_ID, POINTS } = req.body;
     
     // Check if at least one field is provided for update
     if (!SPONSOR_ID && POINTS === undefined) {
