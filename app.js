@@ -67,7 +67,7 @@ app.get('/users', (req, res) => {
             return;
         } else {
             // Result will contain the most recent entry
-            res.status(200).json(result);
+            res.status(200).json(result[0]);
             return;
         }
     });
