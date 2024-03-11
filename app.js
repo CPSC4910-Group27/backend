@@ -133,6 +133,7 @@ app.get('/sponsorusers', async (req, res) => {
     }
     else if(USER_ID)
     {
+        // RETURNS SPONSOR ASSOCIATED WITH SPECIFIC USER ID
         query = 'SELECT * FROM Sponsors WHERE USER_ID = ' + USER_ID.toString();
         connection.query(query,(queryError, result)=> {
             if(queryError){
