@@ -95,11 +95,14 @@ app.get('/sponsors', (req, res) => {
     })
 });
 
-// get all sponsor users
+// GETS ALL SPONSOR USER ACCOUNTS
+// CAN ALSO RETURN ALL SPONSORS ASSOCIATED WITH SPECIFIC SPONSOR COMPANY BY USING QUERY PARAM
+// WILL ALSO RETURN SPECIFIC SPONSOR ACCOUNT BASED ON USER ID
 app.get('/sponsorusers', async (req, res) => {
-    const sponsorID = req.query.sponsorID;
-    // RETURN ALL SPONSORS
-    if (!sponsorID) {
+    const SPONSOR_ID = req.query.SPONSOR_ID;
+    const USER_ID = req.query.USER_ID;
+    // RETURN ALL SPONSOR ACCOUNTS
+    if (!SPONSOR_ID && !USER_ID) {
         query = 'SELECT * FROM Sponsors';
         connection.query(query,(queryError, result)=> {
             if(queryError){
@@ -113,12 +116,27 @@ app.get('/sponsorusers', async (req, res) => {
             }
         });
     }
-    else{
-        // RETURNS ALL SPONSORs ASSOCIATED WITH SPECIFIC SPONSOR
-        query = 'SELECT * FROM Sponsors WHERE SPONSOR_ID = ' + sponsorID.toString();
+    else if(SPONSOR_ID){
+        // RETURNS ALL SPONSORS ASSOCIATED WITH SPECIFIC SPONSOR
+        query = 'SELECT * FROM Sponsors WHERE SPONSOR_ID = ' + SPONSOR_ID.toString();
         connection.query(query,(queryError, result)=> {
             if(queryError){
-                console.error('Error fetching sponsors associated with ${sponsorID}:', queryError);
+                console.error('Error fetching sponsors associated with ${USER_ID}:', queryError);
+                res.status(500).json({ error: 'Internal server error' });
+                return;
+            }
+            else{
+                res.status(200).json(result);
+                return;
+            }
+        });
+    }
+    else if(USER_ID)
+    {
+        query = 'SELECT * FROM Sponsors WHERE USER_ID = ' + USER_ID.toString();
+        connection.query(query,(queryError, result)=> {
+            if(queryError){
+                console.error('Error fetching sponsors associated with ${USER_ID}:', queryError);
                 res.status(500).json({ error: 'Internal server error' });
                 return;
             }
@@ -210,10 +228,10 @@ app.post('/users', (req, res) => {
     }
     
     // SQL query to insert data into the Users table
-    const sql = 'INSERT INTO Users (USER_TYPE, EMAIL, USERNAME) VALUES (?, ?, ?)';
+    const userSQL = 'INSERT INTO Users (USER_TYPE, EMAIL, USERNAME) VALUES (?, ?, ?)';
     
     // Execute the query
-    connection.query(sql, [USER_TYPE, EMAIL, USERNAME], (error, results) => {
+    connection.query(userSQL, [USER_TYPE, EMAIL, USERNAME], (error, results) => {
         if (error) {
         console.error('Error inserting user:', error);
         return res.status(500).json({ error: 'Internal Server Error' });
@@ -223,6 +241,7 @@ app.post('/users', (req, res) => {
         res.json({ message: 'User added to the Users table successfully', result: results });
         return;
     });
+
 });
       
 // POST endpoint to add data to the Application table (NEED TO PROTECT AGAINST SQL INJECTION)
