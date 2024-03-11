@@ -339,7 +339,7 @@ app.patch('/users/:USER_ID',(req,res) =>{
         console.log('No SPONSOR_ID to assign')
         return res.status(400).json({ error: 'No SPONSOR_ID to assign' });
     }
-    const users_sql = `UPDATE Users SET USER_TYPE = ? WHERE USER_ID = ?`;
+    const users_sql = `UPDATE Users SET USER_TYPE = (USER_TYPE) WHERE USER_ID = (USER_ID) VALUES (?, ?)`;
     connection.query(users_sql,[USER_TYPE,USER_ID], (error, results) => {
         if (error) {
             console.error('Error updating user:', error);
