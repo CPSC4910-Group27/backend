@@ -326,14 +326,17 @@ app.patch('/users/:USER_ID'),(req,res) =>{
     const {SPONSOR_ID, USER_TYPE} = req.body;
     if(USER_ID === undefined)
     {
+        console.log('No USER_ID provided in query')
         return res.status(400).json({ error: 'No USER_ID provided in query' });
     }
     if(!USER_TYPE)
     {
+        console.log('No USER_TYPE to change too')
         return res.status(400).json({ error: 'No USER_TYPE to change too' });
     }
     if(!SPONSOR_ID)
     {
+        console.log('No SPONSOR_ID to assign')
         return res.status(400).json({ error: 'No SPONSOR_ID to assign' });
     }
     const users_sql = `UPDATE Users SET USER_TYPE = ? WHERE USER_ID = ?`;
