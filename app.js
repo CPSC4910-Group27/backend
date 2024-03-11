@@ -58,7 +58,7 @@ app.get('/users', (req, res) => {
     }
     else
     {
-        query = 'SELECT * FROM Users WHERE USERNAME = ' + username.toString();
+        query = "SELECT * FROM Users WHERE USERNAME = '" + username.toString() + "'";    
     }
     connection.query(query,(queryError, result) => {
         if (queryError) {
