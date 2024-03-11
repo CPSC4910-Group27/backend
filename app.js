@@ -95,10 +95,11 @@ app.get('/sponsors', (req, res) => {
     })
 });
 
-// GETS ALL SPONSOR USER ACCOUNTS
+// GETS ALL SPONSOR ACCOUNTS
 // CAN ALSO RETURN ALL SPONSORS ASSOCIATED WITH SPECIFIC SPONSOR COMPANY BY USING QUERY PARAM
 // WILL ALSO RETURN SPECIFIC SPONSOR ACCOUNT BASED ON USER ID
-app.get('/sponsorusers', async (req, res) => {
+// ALSO RETURNS ADMIN STATUS
+app.get('/sponsoraccounts', async (req, res) => {
     const SPONSOR_ID = req.query.SPONSOR_ID;
     const USER_ID = req.query.USER_ID;
     // RETURN ALL SPONSOR ACCOUNTS
@@ -235,7 +236,7 @@ app.post('/users', (req, res) => {
         if (!USERNAME) {
             missingFields.push('USERNAME');
         }
-        
+
         const errorMessage = `ERROR INSERTING USER! Missing fields: ${missingFields.join(', ')}`;
         console.log(errorMessage);
         return res.status(400).json({ error: errorMessage });
@@ -305,6 +306,43 @@ app.post('/drivers', (req, res) => {
         res.json({ message: 'Driver added to the Drivers table successfully'});
     });
 });
+
+// Updates a users information and assigns them to the correct table
+app.patch('/users'),(req,res) =>{
+    const USER_ID = req.query.USER_ID;
+    const {SPONSOR_ID, USER_TYPE} = req.body;
+    if(USER_ID === undefined)
+    {
+        return res.status(400).json({ error: 'No USER_ID provided in query' });
+    }
+    if(!USER_TYPE)
+    {
+        return res.status(400).json({ error: 'No USER_TYPE to change too' });
+    }
+    if(!SPONSOR_ID)
+    {
+        return res.status(400).json({ error: 'No SPONSOR_ID to assign' });
+    }
+    const users_sql = `UPDATE Users SET USER_TYPE = ? WHERE USER_ID = ?`;
+    connection.query(users_sql,[USER_TYPE,USER_ID], (error, results) => {
+        if (error) {
+            console.error('Error updating user:', error);
+            return res.status(500).json({ error: 'Internal Server Error' });
+        } else {
+            console.log('User updated successfully:', results);
+        }
+    });
+    const insertSponsorSQL = 'INSERT INTO Sponsors (USER_ID, SPONSOR_ID) VALUES (?, ?)';
+    connection.query(insertSponsorSQL, [USER_ID, sponsorData], (error, results) => {
+        if (error) {
+            console.error('Error updating user:', error);
+            return res.status(500).json({ error: 'Internal Server Error' });
+        } else {
+            console.log('User updated successfully:', results);
+            return res.status(200).results.json();
+        }
+    });
+}
 
 // Update a driver's information
 app.patch('/drivers/:USER_ID', (req, res) => {
