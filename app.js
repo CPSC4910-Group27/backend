@@ -53,28 +53,41 @@ app.get('/about', (req, res) => {
 // Gets all users or certain user based on username given
 app.get('/users', (req, res) => {
     const username = req.query.USERNAME;
-    if (!username) {
+    const USER_TYPE = req.query.USER_TYPE;
+    if (!username && !USER_TYPE) {
         query = 'SELECT * FROM Users'
     }
-    else
+    else if (username)
     {
         query = "SELECT * FROM Users WHERE USERNAME = '" + username.toString() + "'";    
     }
+    else if (USER_TYPE)
+    {
+        query = "SELECT * FROM Users WHERE USER_TYPE = '" + USER_TYPE.toString() + "'"; 
+    }
+    else{
+            res.status(400).json({ error: 'Missing Query Params' });
+            return;
+        }
     connection.query(query,(queryError, result) => {
         if (queryError) {
             console.error('Error executing query:', queryError);
             res.status(500).json({ error: 'Internal Server Error' });
             return;
         } 
-        else if(!username)
+        else if(!username && !USER_TYPE)
         {
             res.status(200).json(result);
         }
          
-        else {
+        else if(username){
             // Result will contain the most recent entry
             res.status(200).json(result[0]);
             return;
+        }
+        else if(USER_TYPE)
+        {
+            res.status(200).json(result);
         }
     });
 });
