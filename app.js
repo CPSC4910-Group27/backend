@@ -349,7 +349,7 @@ app.patch('/users/:USER_ID',(req,res) =>{
         }
     });
     const insertSponsorSQL = 'INSERT INTO Sponsors (USER_ID, SPONSOR_ID) VALUES (?, ?)';
-    connection.query(insertSponsorSQL, [USER_ID, sponsorData], (error, results) => {
+    connection.query(insertSponsorSQL, [USER_ID, SPONSOR_ID], (error, results) => {
         if (error) {
             console.error('Error updating user:', error);
             return res.status(500).json({ error: 'Internal Server Error' });
