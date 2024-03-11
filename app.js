@@ -224,8 +224,21 @@ app.post('/users', (req, res) => {
     const {USER_TYPE, EMAIL, USERNAME} = req.body;
 
     // Check if required fields are provided
-    if (!USER_TYPE|| !EMAIL || !USERNAME) {
-        return res.status(400).json({ error: 'Missing required fields' });
+    if (!USER_TYPE || !EMAIL || !USERNAME) {
+        const missingFields = [];
+        if (!USER_TYPE) {
+            missingFields.push('USER_TYPE');
+        }
+        if (!EMAIL) {
+            missingFields.push('EMAIL');
+        }
+        if (!USERNAME) {
+            missingFields.push('USERNAME');
+        }
+        
+        const errorMessage = `ERROR INSERTING USER! Missing fields: ${missingFields.join(', ')}`;
+        console.log(errorMessage);
+        return res.status(400).json({ error: errorMessage });
     }
     
     // SQL query to insert data into the Users table
