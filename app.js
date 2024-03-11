@@ -141,7 +141,7 @@ app.get('/sponsorusers', async (req, res) => {
                 return;
             }
             else{
-                res.status(200).json(result);
+                res.status(200).json(result[0]);
                 return;
             }
         });
