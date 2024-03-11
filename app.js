@@ -324,6 +324,8 @@ app.post('/drivers', (req, res) => {
 app.patch('/users/:USER_ID',(req,res) =>{
     const USER_ID = req.params.USER_ID;
     const {SPONSOR_ID, USER_TYPE} = req.body;
+    console.log("USER_ID",USER_ID);
+    console.log("SPONSOR ID ", SPONSOR_ID," USER TYPE ", USER_TYPE);
     if(USER_ID === undefined)
     {
         console.log('No USER_ID provided in query')
