@@ -163,8 +163,9 @@ app.get('/sponsoraccounts', async (req, res) => {
 // get all drivers
 app.get('/drivers', async (req, res) => {
     const sponsorID = req.query.sponsorID;
+    const userID = req.query.userID;
     // RETURN ALL DRIVERS
-    if (!sponsorID) {
+    if (!sponsorID && !userID) {
         query = 'SELECT * FROM DriverSponsorships';
         connection.query(query,(queryError, result)=> {
             if(queryError){
@@ -178,7 +179,23 @@ app.get('/drivers', async (req, res) => {
             }
         });
     }
-    else{
+    else if (sponsorID && userID){
+        // RETURNS SPECIFIC DRIVER ASSOCIATED WITH SPECIFIC SPONSOR
+        query = 'SELECT * FROM DriverSponsorships WHERE SPONSOR_ID = ' + sponsorID.toString() 
+                + 'AND WHERE USER_ID = ' + userID.toString();
+        connection.query(query,(queryError, result)=> {
+            if(queryError){
+                console.error('Error fetching drivers associated with ${sponsorID}:', queryError);
+                res.status(500).json({ error: 'Internal server error' });
+                return;
+            }
+            else{
+                res.status(200).json(result);
+                return;
+            }
+        });
+    }
+    else if (sponsorID) {
         // RETURNS ALL DRIVERs ASSOCIATED WITH SPECIFIC SPONSOR
         query = 'SELECT * FROM DriverSponsorships WHERE SPONSOR_ID = ' + sponsorID.toString();
         connection.query(query,(queryError, result)=> {
