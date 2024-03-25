@@ -252,7 +252,7 @@ app.post('/users', (req, res) => {
     const {USER_TYPE, EMAIL, USERNAME, FNAME, LNAME} = req.body;
 
     // Check if required fields are provided
-    if (!USER_TYPE || !EMAIL || !USERNAME || FNAME || LNAME) {
+    if (!USER_TYPE || !EMAIL || !USERNAME || !FNAME || !LNAME) {
         const missingFields = [];
         if (!USER_TYPE) {
             missingFields.push('USER_TYPE');
