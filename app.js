@@ -249,10 +249,10 @@ app.get('/applications', async (req, res) => {
 
 // Takes in a new user for the database  
 app.post('/users', (req, res) => {
-    const {USER_TYPE, EMAIL, USERNAME} = req.body;
+    const {USER_TYPE, EMAIL, USERNAME, FNAME, LNAME} = req.body;
 
     // Check if required fields are provided
-    if (!USER_TYPE || !EMAIL || !USERNAME) {
+    if (!USER_TYPE || !EMAIL || !USERNAME || FNAME || LNAME) {
         const missingFields = [];
         if (!USER_TYPE) {
             missingFields.push('USER_TYPE');
@@ -263,17 +263,22 @@ app.post('/users', (req, res) => {
         if (!USERNAME) {
             missingFields.push('USERNAME');
         }
-
+        if (!FNAME) {
+            missingFields.push('FNAME');
+        }
+        if (!LNAME) {
+            missingFields.push('LNAME');
+        }
         const errorMessage = `ERROR INSERTING USER! Missing fields: ${missingFields.join(', ')}`;
         console.log(errorMessage);
         return res.status(400).json({ error: errorMessage });
     }
     
     // SQL query to insert data into the Users table
-    const userSQL = 'INSERT INTO Users (USER_TYPE, EMAIL, USERNAME) VALUES (?, ?, ?)';
+    const userSQL = 'INSERT INTO Users (USER_TYPE, EMAIL, USERNAME, FNAME, LNAME) VALUES (?, ?, ?, ?, ?)';
     
     // Execute the query
-    connection.query(userSQL, [USER_TYPE, EMAIL, USERNAME], (error, results) => {
+    connection.query(userSQL, [USER_TYPE, EMAIL, USERNAME, FNAME, LNAME], (error, results) => {
         if (error) {
         console.error('Error inserting user:', error);
         return res.status(500).json({ error: 'Internal Server Error' });
