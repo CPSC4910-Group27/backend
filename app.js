@@ -323,6 +323,41 @@ app.get('/applications', async (req, res) => {
     }
 });
 
+// RETURNS ALL ITEMS FROM THE CATALOG 
+// OR WILL RETURN ALL ITEMS ASSOCIATED WITH A SPECIFIC SPONSOR
+app.get('/catalog',(req,res)=>{
+    const SPONSOR_ID = req.query.SPONSOR_ID;
+    // RETURNS ALL CATALOG ITEMS ASSOCIATED WITH A SPECIFIC SPONSOR
+    if(SPONSOR_ID){
+        sql = `SELECT * FROM CATALOG WHERE SPONSOR_ID = ${SPONSOR_ID}`
+        connection.query(sql,(queryError, result)=> {
+            if(queryError){
+                console.error(`Error fetching catalog items associated with ${SPONSOR_ID}:`, queryError);
+                res.status(500).json({ error: 'Internal server error' });
+                return;
+            }
+            else{
+                res.status(200).json(result);
+                return;
+            }
+        });
+    }
+    // ELSE RETURN ALL CATALOG ITEMS
+    else{
+        sql = `SELECT * FROM CATALOG`
+        connection.query(sql,(queryError, result)=> {
+            if(queryError){
+                console.error(`Error fetching catalog items associated with ${SPONSOR_ID}:`, queryError);
+                res.status(500).json({ error: 'Internal server error' });
+                return;
+            }
+            else{
+                res.status(200).json(result);
+                return;
+            }
+        });
+    }
+});
 // Takes in a new user for the database  
 app.post('/users', (req, res) => {
     const {USER_TYPE, EMAIL, USERNAME, FNAME, LNAME} = req.body;
@@ -542,6 +577,28 @@ app.post('/sponsors', (req, res) => {
     });
 });
 
+// Takes in a new item to the catalog
+app.post('/catalog',(req, res) =>{
+    const {ITEM_ID, SPONSOR_ID} = req.body;
+    if(!SPONSOR_ID)
+    {
+        return res.status(400).json({ error: 'MISSING FIELD: SPONSOR_ID' });
+    }
+    if(!ITEM_ID)
+    {
+        return res.status(400).json({ error: 'MISSING FIELD: ITEM_ID' });
+    }
+    sql = `INSERT INTO CATALOG (ITEM_ID, SPONSOR_ID) VALUES (?, ?)`
+    connection.query(sql, [ITEM_ID, SPONSOR_ID], (error, results) => {
+        if (error) {
+            console.error('Error inserting item into catalog :', error);
+            return res.status(500).json({ error: 'Internal Server Error' });
+        } else {
+            console.log('Catalog item added successfully:', results);
+            return res.status(200).json({ message: 'Item added successfully' });
+        }
+    });
+})
 // HOME PAGE 
 app.get('/', (req, res) => {
   res.send('Hello, Express!');
