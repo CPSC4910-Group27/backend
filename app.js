@@ -89,20 +89,38 @@ app.get('/users', (req, res) => {
     });
 });
 
-// Returns all sponsors
+// Returns all sponsors or a list of sponsors associated with user ID
 app.get('/sponsors', (req, res) => {
-    const query = 'SELECT * FROM SponsorCompany';
-    connection.query(query,(queryError, result) => {
-        if (queryError) {
-            console.error('Error executing query:', queryErr);
-            res.status(500).json({ error: 'Internal Server Error' });
-            return;
-        } else {
-            // Result will contain the most recent entry
-            res.status(200).json(result);
-            return;
-        }
-    })
+    const SPONSOR_ID = req.query.SPONSOR_ID;
+    if(!SPONSOR_ID){
+        const query = 'SELECT * FROM SponsorCompany';
+        connection.query(query,(queryError, result) => {
+            if (queryError) {
+                console.error('Error executing query:', queryErr);
+                res.status(500).json({ error: 'Internal Server Error' });
+                return;
+            } else {
+                // Result will contain the most recent entry
+                res.status(200).json(result);
+                return;
+            }
+        })
+    }
+    else if (SPONSOR_ID)
+    {
+        const query = 'SELECT * FROM SponsorCompany';
+        connection.query(query,(queryError, result) => {
+            if (queryError) {
+                console.error('Error executing query:', queryErr);
+                res.status(500).json({ error: 'Internal Server Error' });
+                return;
+            } else {
+                // Result will contain the most recent entry
+                res.status(200).json(result);
+                return;
+            }
+        })
+    }
 });
 
 // GETS ALL SPONSOR ACCOUNTS
@@ -160,7 +178,13 @@ app.get('/sponsoraccounts', async (req, res) => {
     }
 });
   
-// get all drivers
+/* 
+    WHERE TO GET ALL INFORMATION ASSOCIATED WITH A DRIVER SPONSORSHIPS
+    BY DEFAULT WILL RETURN ALL DRIVERS ASSOCIATED WITH SPONSORS
+    WITH A QUERY OF sponsorID WILL RETURN ALL DRIVERS ASSOCIATED WITH SPONSOR
+    WITH A QUERY OF userID WILL RETURN ALL SPONSORS ASSOCIATED WITH userID
+    WITH A QUERY OF BOTH WILL RETURN SPECIFIC SPONSOR
+*/
 app.get('/drivers', async (req, res) => {
     const sponsorID = req.query.sponsorID;
     const userID = req.query.userID;
@@ -210,6 +234,27 @@ app.get('/drivers', async (req, res) => {
             }
         });
     }
+    else if (userID){
+        // RETURNS ALL SPONSORS ASSOCIATED WITH SPECIFIC DRIVER
+        query  = `
+        SELECT SPONSOR_NAME
+        FROM DriverSponsorships D
+        JOIN SponsorCompany S ON D.SPONSOR_ID = S.SPONSOR_ID
+        WHERE USER_ID = ` + userID.toString() `
+        GROUP BY USER_ID`;
+        connection.query(query,(queryError, result)=> {
+            if(queryError){
+                console.error(`Error fetching sponsors associated with ${userID}:`, queryError);
+                res.status(500).json({ error: 'Internal server error' });
+                return;
+            }
+            else{
+                res.status(200).json(result);
+                return;
+            }
+        });
+    }
+
 });
 
 // get all sponsor applications
