@@ -3,7 +3,7 @@ const app = express();
 const mysql = require('mysql');
 const cors = require('cors');
 const bodyParser = require('body-parser');
-const port = process.env.PORT || 3000;
+const port = process.env.PORT || 3004;
 
 // Configuring database connection
 const connection = mysql.createConnection({
@@ -237,7 +237,7 @@ app.get('/drivers', async (req, res) => {
     else if (userID){
         // RETURNS ALL SPONSORS ASSOCIATED WITH SPECIFIC DRIVER
         query  = `
-        SELECT SPONSOR_NAME
+        SELECT S.SPONSOR_ID, SPONSOR_NAME, POINTS
         FROM DriverSponsorships D
         JOIN SponsorCompany S ON D.SPONSOR_ID = S.SPONSOR_ID
         WHERE USER_ID = ${userID}
