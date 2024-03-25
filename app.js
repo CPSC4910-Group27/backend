@@ -258,9 +258,10 @@ app.get('/drivers', async (req, res) => {
 
 // get all sponsor applications
 app.get('/applications', async (req, res) => {
-    const sponsorID = req.query.sponsorID;
+    const sponsorID = req.query.sponsorID
+    const USER_ID = req.query.USER_ID;
     // RETURN ALL APPLICATIONS
-    if (!sponsorID) {
+    if (!sponsorID && !USER_ID) {
         query = 'SELECT * FROM Application';
         connection.query(query,(queryError, result)=> {
             if(queryError){
@@ -274,9 +275,40 @@ app.get('/applications', async (req, res) => {
             }
         });
     }
-    else{
-        // RETURNS ALL APPLICATIONs ASSOCIATED WITH SPECIFIC SPONSOR
+    // RETURNS A SPECIFIC APPLICATION BASED ON USER ID AND SPONSOR ID
+    else if(sponsorID && USER_ID){
+        query = 'SELECT * FROM Application WHERE SPONSOR_ID = ' + sponsorID.toString() + ' AND USER_ID = ' + USER_ID.toString();
+        connection.query(query,(queryError, result)=> {
+            if(queryError){
+                console.error('Error fetching application associated with ${sponsorID}:', queryError);
+                res.status(500).json({ error: 'Internal server error' });
+                return;
+            }
+            else{
+                res.status(200).json(result);
+                return;
+            }
+        });
+    }
+    // RETURNS ALL APPLICATIONs ASSOCIATED WITH SPECIFIC SPONSOR
+    else if (sponsorID){
         query = 'SELECT * FROM Application WHERE SPONSOR_ID = ' + sponsorID.toString();
+        connection.query(query,(queryError, result)=> {
+            if(queryError){
+                console.error('Error fetching application associated with ${sponsorID}:', queryError);
+                res.status(500).json({ error: 'Internal server error' });
+                return;
+            }
+            else{
+                res.status(200).json(result);
+                return;
+            }
+        });
+    }
+    // RETURNS ALL APPLICATIONS FOR SPECIFIC USER
+    else if (USER_ID)
+    {
+        query = 'SELECT * FROM Application WHERE USER_ID = ' + USER_ID.toString();
         connection.query(query,(queryError, result)=> {
             if(queryError){
                 console.error('Error fetching application associated with ${sponsorID}:', queryError);
