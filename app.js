@@ -240,7 +240,7 @@ app.get('/drivers', async (req, res) => {
         SELECT SPONSOR_NAME
         FROM DriverSponsorships D
         JOIN SponsorCompany S ON D.SPONSOR_ID = S.SPONSOR_ID
-        WHERE USER_ID = ` + userID.toString() `
+        WHERE USER_ID = ` + userID`
         GROUP BY USER_ID`;
         connection.query(query,(queryError, result)=> {
             if(queryError){
