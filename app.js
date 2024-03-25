@@ -598,7 +598,7 @@ app.post('/catalog',(req, res) =>{
             return res.status(200).json({ message: 'Item added successfully' });
         }
     });
-})
+});
 // HOME PAGE 
 app.get('/', (req, res) => {
   res.send('Hello, Express!');
