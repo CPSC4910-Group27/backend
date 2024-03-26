@@ -641,6 +641,47 @@ app.post('/catalog',(req, res) =>{
     });
 });
 
+// Takes in a new password change
+app.post('/password_change',(req, res)=>{
+    const {USER_ID, AUDIT_USER_ID, REASON} = req.body;
+    if(!USER_ID)
+    {
+        return res.status(400).json({ error: 'MISSING FIELD: USER_ID' });
+    }
+    if(!AUDIT_USER_ID)
+    {
+        return res.status(400).json({ error: 'MISSING FIELD: AUDIT_USER_ID' });
+    }
+    if(!REASON)
+    {
+        return res.status(400).json({ error: 'MISSING FIELD: REASON' });
+    }
+    // Create initial insert into AuditEntry table
+    auditSql = 'INSERT INTO AuditEntry (USER_ID, AUDIT_TYPE, AUDIT_DATE) VALUES (?, "Password Change", CURDATE())'
+    connection.query(auditSql, [USER_ID], (error, results) => {
+        if (error) {
+            console.error('Error inserting item into AuditEntry table :', error);
+            return res.status(500).json({ error: 'Internal Server Error' });
+        } else {
+            console.log('AuditEntry item added successfully:', results);
+        }
+    // Insert into log in table
+        loginSql = 'INSERT INTO PASSAUDIT (AUDIT_ID, AUDIT_USER, AUDIT_CHANGE_TYPE) VALUES (?,?,?)'
+        const AUDIT_ID = results.insertId;
+
+        connection.query(loginSql, [AUDIT_ID, AUDIT_USER_ID, REASON], (error, results) => {
+            if (error) {
+                console.error('Error inserting item into log in tables :', error);
+                return res.status(500).json({ error: 'Internal Server Error' });
+            } else {
+                console.log('Log in attepmt added successfully:', results);
+                return res.status(200).json({ message: 'Log in attempt added successfully' });
+            }
+        });
+    });
+
+});
+
 // Takes in a new log in attempt
 app.post('/login_attempt',(req, res)=>{
     const {USERNAME, SUCCESS} = req.body;
@@ -685,5 +726,5 @@ app.get('/', (req, res) => {
 
 // Start the server
 app.listen(port, () => {
-  console.log(`Server is running on http://localhost:${port}`);
+    console.log(`Server is running on http://localhost:${port}`);
 });
