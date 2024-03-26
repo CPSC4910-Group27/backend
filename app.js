@@ -108,7 +108,7 @@ app.get('/sponsors', (req, res) => {
     }
     else if (SPONSOR_ID)
     {
-        const query = 'SELECT * FROM SponsorCompany';
+        const query = `SELECT * FROM SponsorCompany where SPONSOR_ID = ${SPONSOR_ID}`;
         connection.query(query,(queryError, result) => {
             if (queryError) {
                 console.error('Error executing query:', queryErr);
@@ -448,6 +448,47 @@ app.post('/drivers', (req, res) => {
         // Send a success response
         res.json({ message: 'Driver added to the Drivers table successfully'});
     });
+});
+
+app.patch('/sponsors/:SPONSOR_ID',(req,res) => {
+    const SPONSOR_ID = req.params.SPONSOR_ID;
+    const {SPONSOR_NAME, POINT_MULTIPLIER} = req.body;
+    if(!SPONSOR_ID)
+    {
+        console.log("No SPONSOR_ID in query provided");
+        return res.status(400).json({error: "No SPONSOR_ID provided in query"});
+    }
+    if(SPONSOR_NAME)
+    {
+        sql = `UPDATE SponsorCompany SET SPONSOR_NAME = ${SPONSOR_NAME} WHERE SPONSOR_ID = ${SPONSOR_ID}`
+        connection.query(sql, (error, results) => {
+            if (error) {
+                console.error('Error updating sponsor name', error);
+                return res.status(500).json({ error: 'Internal Server Error' });
+            } else {
+                console.log('Sponsor name updated successfully:', results);
+                return res.status(200).json({ message: "Sponsor name updated" });
+            }
+        });
+    }
+    else if(POINT_MULTIPLIER)
+    {
+        sql = `UPDATE SponsorCompany SET POINT_MULTIPLIER = ${POINT_MULTIPLIER} WHERE SPONSOR_ID = ${SPONSOR_ID}`
+        connection.query(sql, (error, results) => {
+            if (error) {
+                console.error('Error updating point multiplier', error);
+                return res.status(500).json({ error: 'Internal Server Error' });
+            } else {
+                console.log('Point Multiplier updated successfully:', results);
+                return res.status(200).json({ message: "Point Multiplier updated" });
+            }
+        });
+    }
+    else
+    {
+        console.error('Error, no fields to update for sponsor', error);
+        return res.status(400).json({ error: 'Missing Fields' });
+    }
 });
 
 // Updates a users information and assigns them to the sponsors table
