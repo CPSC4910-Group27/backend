@@ -485,7 +485,7 @@ app.patch('/sponsors/:SPONSOR_ID',(req,res) => {
         });
     }
     else
-    {
+    {setClause
         console.error('Error, no fields to update for sponsor', error);
         return res.status(400).json({ error: 'Missing Fields' });
     }
@@ -533,37 +533,22 @@ app.patch('/users/:USER_ID',(req,res) =>{
     });
 });
 
-// Update a driver's information
-app.patch('/drivers/:USER_ID', (req, res) => {
+// Updates a drivers point value with a specific company
+app.patch('/drivers/:USER_ID/:SPONSOR_ID', (req, res) => {
     const USER_ID = req.params.USER_ID;
-    const { SPONSOR_ID, POINTS } = req.body;
+    const SPONSOR_ID = req.params.SPONSOR_ID;
+    const { POINTS } = req.body;
     
     // Check if at least one field is provided for update
-    if (!SPONSOR_ID && POINTS === undefined) {
-        return res.status(400).json({ error: 'No fields provided for update' });
+    if (POINTS === undefined) {
+        return res.status(400).json({ error: 'Missing Field: POINTS' });
     }
-    
-    // Construct SET clause dynamically based on provided fields
-    let setClause = '';
-    const values = [];
-    if (SPONSOR_ID !== undefined) {
-        setClause += 'SPONSOR_ID = ?, ';
-        values.push(SPONSOR_ID);
-    }
-    if (POINTS !== undefined) {
-        setClause += 'POINTS = ?, ';
-        values.push(POINTS);
-    }
-
-    // Remove trailing comma and space from SET clause
-    setClause = setClause.slice(0, -2);
     
     // SQL query to update driver's information
-    const sql = `UPDATE Drivers SET ${setClause} WHERE USER_ID = ?`;
-    values.push(USER_ID);
+    const sql = `UPDATE DriverSponsorships SET POINTS = ${POINTS} WHERE USER_ID = ${USER_ID} AND SPONSOR_ID = ${SPONSOR_ID}`;
     
     // Execute the query
-    connection.query(sql, values, (error, results) => {
+    connection.query(sql, (error, results) => {
         if (error) {
             console.error('Error updating driver:', error);
             return res.status(500).json({ error: 'Internal Server Error' });
@@ -574,10 +559,36 @@ app.patch('/drivers/:USER_ID', (req, res) => {
         }
         
         // Send a success response
-        res.json({ message: 'Driver information updated successfully'});
+        return res.json({ message: 'Driver point information updated successfully'});
     });
 });
 
+// Updates Application Status
+app.patch('/application/:USER_ID/:SPONSOR_ID', (req,res) => {
+    const USER_ID = req.params.USER_ID;
+    const SPONSOR_ID = req.params.SPONSOR_ID;
+    const {STATUS, REASON} = req.body;
+    if (STATUS === undefined) {
+        return res.status(400).json({ error: 'Missing Field: STATUS' });
+    }
+    if (REASON === undefined) {
+        return res.status(400).json({ error: 'Missing Field: REASON' });
+    }
+    const sql = `UPDATE Application SET STATUS = ${STATUS}, REASON = ${REASON} WHERE USER_ID = ${USER_ID} AND SPONSOR_ID = ${SPONSOR_ID}`;
+    connection.query(sql, (error, results) => {
+        if (error) {
+            console.error('Error updating driver:', error);
+            return res.status(500).json({ error: 'Internal Server Error' });
+        }
+        
+        if (results.affectedRows === 0) {
+            return res.status(404).json({ error: 'Application not found' });
+        }
+        
+        // Send a success response
+        return res.json({ message: 'Application updated successfully'});
+    });
+})
 // Takes in a new sponsor to Sponsors table
 app.post('/sponsors', (req, res) => {
     const { SPONSOR_ADMIN_ID, USER_ID } = req.body; // Assuming you have SPONSOR_ADMIN_ID and USER_ID in the request body
@@ -640,6 +651,8 @@ app.post('/catalog',(req, res) =>{
         }
     });
 });
+// Takes in application change for Audit Table
+// app.post('/application_change') NEEDS WORK
 
 // Takes in a new password change
 app.post('/password_change',(req, res)=>{
@@ -674,8 +687,8 @@ app.post('/password_change',(req, res)=>{
                 console.error('Error inserting item into log in tables :', error);
                 return res.status(500).json({ error: 'Internal Server Error' });
             } else {
-                console.log('Log in attepmt added successfully:', results);
-                return res.status(200).json({ message: 'Log in attempt added successfully' });
+                console.log('Password chaned attepmt added successfully:', results);
+                return res.status(200).json({ message: 'Password change added successfully' });
             }
         });
     });
