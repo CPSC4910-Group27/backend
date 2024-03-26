@@ -603,6 +603,7 @@ app.post('/catalog',(req, res) =>{
 // Takes in a new log in attempt
 app.post('/login_attempt',(req, res)=>{
     const {USERNAME, SUCCESS} = req.body;
+    let AUDIT_ID = null;
     if(!USERNAME)
     {
         return res.status(400).json({ error: 'MISSING FIELD: USERNAME' });
@@ -619,10 +620,10 @@ app.post('/login_attempt',(req, res)=>{
             return res.status(500).json({ error: 'Internal Server Error' });
         } else {
             console.log('AuditEntry item added successfully:', results);
+            AUDIT_ID = results.insertId;
         }
     });
     // Insert into log in table
-    const AUDIT_ID = results.insertId;
     loginSql = 'INSERT INTO LOGINAUDIT (AUDIT_ID, AUDIT_USERNAME, AUDIT_STATUS VALUES (?,?,?)'
     connection.query(loginSql, [AUDIT_ID, USERNAME, SUCCESS], (error, results) => {
         if (error) {
