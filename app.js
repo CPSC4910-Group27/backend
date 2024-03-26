@@ -603,7 +603,6 @@ app.post('/catalog',(req, res) =>{
 // Takes in a new log in attempt
 app.post('/login_attempt',(req, res)=>{
     const {USERNAME, SUCCESS} = req.body;
-    let AUDIT_ID = null;
     if(!USERNAME)
     {
         return res.status(400).json({ error: 'MISSING FIELD: USERNAME' });
@@ -620,20 +619,22 @@ app.post('/login_attempt',(req, res)=>{
             return res.status(500).json({ error: 'Internal Server Error' });
         } else {
             console.log('AuditEntry item added successfully:', results);
-            AUDIT_ID = results.insertId;
         }
-    });
     // Insert into log in table
-    loginSql = 'INSERT INTO LOGINAUDIT (AUDIT_ID, AUDIT_USERNAME, AUDIT_STATUS VALUES (?,?,?)'
-    connection.query(loginSql, [AUDIT_ID, USERNAME, SUCCESS], (error, results) => {
-        if (error) {
-            console.error('Error inserting item into log in tables :', error);
-            return res.status(500).json({ error: 'Internal Server Error' });
-        } else {
-            console.log('Log in attepmt added successfully:', results);
-            return res.status(200).json({ message: 'Log in attempt added successfully' });
-        }
+        loginSql = 'INSERT INTO LOGINAUDIT (AUDIT_ID, AUDIT_USERNAME, AUDIT_STATUS VALUES (?,?,?)'
+        const AUDIT_ID = results.insertId;
+
+        connection.query(loginSql, [AUDIT_ID, USERNAME, SUCCESS], (error, results) => {
+            if (error) {
+                console.error('Error inserting item into log in tables :', error);
+                return res.status(500).json({ error: 'Internal Server Error' });
+            } else {
+                console.log('Log in attepmt added successfully:', results);
+                return res.status(200).json({ message: 'Log in attempt added successfully' });
+            }
+        });
     });
+
 });
 
 // HOME PAGE 
