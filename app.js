@@ -602,12 +602,13 @@ app.post('/catalog',(req, res) =>{
 
 // Takes in a new log in attempt
 app.post('/login_attempt',(req, res)=>{
+    SUCCESS = 2;
     const {USERNAME, SUCCESS} = req.body;
     if(!USERNAME)
     {
         return res.status(400).json({ error: 'MISSING FIELD: USERNAME' });
     }
-    if(!SUCCESS)
+    if(SUCCESS === 2)
     {
         return res.status(400).json({ error: 'MISSING FIELD: SUCCESS' });
     }
