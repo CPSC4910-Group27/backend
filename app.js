@@ -432,25 +432,28 @@ app.post('/applications', (req, res) => {
 
 // Takes in a new driver for database
 app.post('/drivers', (req, res) => {
-    const { DRIVER_ID } = req.body;
+    const { USER_ID, SPONSOR_ID } = req.body;
 
     // Check if required fields are provided
-    if (!DRIVER_ID) {
+    if (!USER_ID) {
+        return res.status(400).json({ error: 'Missing required fields' });
+    }
+    if (!SPONSOR_ID) {
         return res.status(400).json({ error: 'Missing required fields' });
     }
 
     // SQL query to insert data into the Drivers table
-    const sql = 'INSERT INTO Drivers (DRIVER_ID) VALUES (?)';
+    const sql = 'INSERT INTO DriverSponsorships (USER_ID, SPONSOR_ID, POINTS) VALUES (?,?,0)';
 
     // Execute the query
-    connection.query(sql, [DRIVER_ID], (error, results) => {
+    connection.query(sql, [USER_ID, SPONSOR_ID], (error, res) => {
         if (error) {
             console.error('Error executing query:', error);
             return res.status(500).json({ error: 'Internal Server Error' });
         }
 
         // Send a success response
-        res.json({ message: 'Driver added to the Drivers table successfully'});
+        res.json({ message: 'Driver added successfully'});
     });
 });
 
@@ -517,7 +520,7 @@ app.post('/catalog',(req, res) =>{
     });
 });
 
-app.post('/driversponsorship')
+
 // Takes in application change for Audit Table
 app.post('/application_change',(req,res) =>{
     const {USER_ID, SPONSOR_ID, DRIVER_ID, STATUS, REASON} = req.body;
@@ -543,7 +546,7 @@ app.post('/application_change',(req,res) =>{
     }
 
     // Create initial insert into AuditEntry table
-    auditSql = 'INSERT INTO AuditEntry (USER_ID, AUDIT_TYPE, AUDIT_DATE) VALUES (?, "Driver Application", CURDATE())'
+    auditSql = 'INSERT INTO AuditEntry (USER_ID, AUDIT_TYPE, AUDIT_DATE) VALUES (?, "Driver Application", CURRENT_TIMESTAMP())'
     connection.query(auditSql, [USER_ID], (error, results) => {
         if (error) {
             console.error('Error inserting item into AuditEntry table :', error);
@@ -583,7 +586,7 @@ app.post('/password_change',(req, res)=>{
         return res.status(400).json({ error: 'MISSING FIELD: REASON' });
     }
     // Create initial insert into AuditEntry table
-    auditSql = 'INSERT INTO AuditEntry (USER_ID, AUDIT_TYPE, AUDIT_DATE) VALUES (?, "Password Change", CURDATE())'
+    auditSql = 'INSERT INTO AuditEntry (USER_ID, AUDIT_TYPE, AUDIT_DATE) VALUES (?, "Password Change", CURRENT_TIMESTAMP())'
     connection.query(auditSql, [USER_ID], (error, results) => {
         if (error) {
             console.error('Error inserting item into AuditEntry table :', error);
@@ -620,7 +623,7 @@ app.post('/login_attempt',(req, res)=>{
         return res.status(400).json({ error: 'MISSING FIELD: SUCCESS' });
     }
     // Create initial insert into AuditEntry table
-    auditSql = 'INSERT INTO AuditEntry (USER_ID, AUDIT_TYPE, AUDIT_DATE) VALUES (NULL, "Log in attempt", CURDATE())'
+    auditSql = 'INSERT INTO AuditEntry (USER_ID, AUDIT_TYPE, AUDIT_DATE) VALUES (NULL, "Log in attempt", CURRENT_TIMESTAMP())'
     connection.query(auditSql, (error, results) => {
         if (error) {
             console.error('Error inserting item into AuditEntry table :', error);
