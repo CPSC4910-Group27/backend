@@ -574,8 +574,9 @@ app.patch('/application/:USER_ID/:SPONSOR_ID', (req,res) => {
     if (REASON === undefined) {
         return res.status(400).json({ error: 'Missing Field: REASON' });
     }
-    const sql = `UPDATE Application SET STATUS=${STATUS}, REASON=${REASON} WHERE USER_ID = ${USER_ID} AND SPONSOR_ID = ${SPONSOR_ID}`;
-    connection.query(sql, (error, results) => {
+    const sql = 'UPDATE Application SET STATUS = ?, REASON = ? WHERE USER_ID = ? AND SPONSOR_ID = ?';
+    const values = [STATUS, REASON, USER_ID, SPONSOR_ID];    
+    connection.query(sql, values, (error, results) => {
         if (error) {
             console.error('Error updating driver:', error);
             return res.status(500).json({ error: 'Internal Server Error' });
