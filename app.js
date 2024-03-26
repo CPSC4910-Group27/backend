@@ -621,7 +621,7 @@ app.post('/login_attempt',(req, res)=>{
             console.log('AuditEntry item added successfully:', results);
         }
     // Insert into log in table
-        loginSql = 'INSERT INTO LOGINAUDIT (AUDIT_ID, AUDIT_USERNAME, AUDIT_STATUS VALUES (?,?,?)'
+        loginSql = 'INSERT INTO LOGINAUDIT (AUDIT_ID, AUDIT_USERNAME, AUDIT_STATUS) VALUES (?,?,?)'
         const AUDIT_ID = results.insertId;
 
         connection.query(loginSql, [AUDIT_ID, USERNAME, SUCCESS], (error, results) => {
