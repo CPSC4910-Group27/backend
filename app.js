@@ -260,7 +260,7 @@ app.get('/drivers', async (req, res) => {
 app.get('/applications', async (req, res) => {
     const SPONSOR_ID = req.query.SPONSOR_ID
     const USER_ID = req.query.USER_ID;
-    
+
     // RETURN ALL APPLICATIONS
     if (!SPONSOR_ID && !USER_ID) {
         query = 'SELECT * FROM Application';
@@ -454,6 +454,197 @@ app.post('/drivers', (req, res) => {
     });
 });
 
+// Takes in a new sponsor to Sponsors table
+app.post('/sponsors', (req, res) => {
+    const { SPONSOR_ADMIN_ID, USER_ID } = req.body; // Assuming you have SPONSOR_ADMIN_ID and USER_ID in the request body
+
+    // Check if required fields are provided
+    if (!SPONSOR_ADMIN_ID || !USER_ID) {
+        return res.status(400).json({ error: 'Missing required fields' });
+    }
+
+    // SQL query to fetch sponsorId based on admin's userId
+    const sponsorIDQuery = 'SELECT SPONSOR_ID FROM Sponsors WHERE USER_ID = ?';
+
+    // Execute the query
+    connection.query(sponsorIDQuery, [SPONSOR_ADMIN_ID], (error, results) => {
+        if (error) {
+            console.error('Error fetching sponsor ID:', error);
+            return res.status(500).json({ error: 'Internal Server Error' });
+        }
+
+        if (results.length === 0) {
+            return res.status(404).json({ error: 'Sponsor admin not found' });
+        }
+
+        const sponsorId = results[0].sponsorId;
+
+        // SQL query to insert data into the Sponsors table
+        const insertSponsorQuery = 'INSERT INTO Sponsors (USER_ID, SPONSOR_ID) VALUES (?, ?)';
+
+        // Execute the query to insert new sponsor
+        connection.query(insertSponsorQuery, [USER_ID, sponsorId], (error, insertResults) => {
+            if (error) {
+                console.error('Error inserting sponsor:', error);
+                return res.status(500).json({ error: 'Internal Server Error' });
+            }
+
+            res.json({ message: 'Sponsor account created successfully', result: insertResults });
+        });
+    });
+});
+
+// Takes in a new item to the catalog
+app.post('/catalog',(req, res) =>{
+    const {ITEM_ID, SPONSOR_ID} = req.body;
+    if(!SPONSOR_ID)
+    {
+        return res.status(400).json({ error: 'MISSING FIELD: SPONSOR_ID' });
+    }
+    if(!ITEM_ID)
+    {
+        return res.status(400).json({ error: 'MISSING FIELD: ITEM_ID' });
+    }
+    sql = `INSERT INTO CATALOG (ITEM_ID, SPONSOR_ID) VALUES (?, ?)`
+    connection.query(sql, [ITEM_ID, SPONSOR_ID], (error, results) => {
+        if (error) {
+            console.error('Error inserting item into catalog :', error);
+            return res.status(500).json({ error: 'Internal Server Error' });
+        } else {
+            console.log('Catalog item added successfully:', results);
+            return res.status(200).json({ message: 'Item added successfully' });
+        }
+    });
+});
+
+app.post('/driversponsorship')
+// Takes in application change for Audit Table
+app.post('/application_change',(req,res) =>{
+    const {USER_ID, SPONSOR_ID, DRIVER_ID, STATUS, REASON} = req.body;
+    if(!USER_ID)
+    {
+        return res.status(400).json({ error: 'MISSING FIELD: USER_ID' });
+    }
+    if(!SPONSOR_ID)
+    {
+        return res.status(400).json({ error: 'MISSING FIELD: SPONSOR_ID' });
+    }
+    if(!REASON)
+    {
+        return res.status(400).json({ error: 'MISSING FIELD: REASON' });
+    }
+    if(!STATUS)
+    {
+        return res.status(400).json({ error: 'MISSING FIELD: STATUS' });
+    }
+    if(!DRIVER_ID)
+    {
+        return res.status(400).json({ error: 'MISSING FIELD: DRIVER_ID' });
+    }
+
+    // Create initial insert into AuditEntry table
+    auditSql = 'INSERT INTO AuditEntry (USER_ID, AUDIT_TYPE, AUDIT_DATE) VALUES (?, "Driver Application", CURDATE())'
+    connection.query(auditSql, [USER_ID], (error, results) => {
+        if (error) {
+            console.error('Error inserting item into AuditEntry table :', error);
+            return res.status(500).json({ error: 'Internal Server Error' });
+        } else {
+            console.log('AuditEntry item added successfully:', results);
+        }
+    // Insert into log in table
+        loginSql = 'INSERT INTO APPAUDIT (AUDIT_ID, AUDIT_SPONSOR, AUDIT_DRIVER, AUDIT_STATUS, AUDIT_REASON) VALUES (?,?,?,?,?)'
+        const AUDIT_ID = results.insertId;
+
+        connection.query(loginSql, [AUDIT_ID, SPONSOR_ID, DRIVER_ID, STATUS, REASON], (error, results) => {
+            if (error) {
+                console.error('Error inserting item into log in tables :', error);
+                return res.status(500).json({ error: 'Internal Server Error' });
+            } else {
+                console.log('Driver application added successfully:', results);
+                return res.status(200).json({ message: 'Driver Application audited successfully' });
+            }
+        });
+    });
+})
+
+// Takes in a new password change for the audit table
+app.post('/password_change',(req, res)=>{
+    const {USER_ID, AUDIT_USER_ID, REASON} = req.body;
+    if(!USER_ID)
+    {
+        return res.status(400).json({ error: 'MISSING FIELD: USER_ID' });
+    }
+    if(!AUDIT_USER_ID)
+    {
+        return res.status(400).json({ error: 'MISSING FIELD: AUDIT_USER_ID' });
+    }
+    if(!REASON)
+    {
+        return res.status(400).json({ error: 'MISSING FIELD: REASON' });
+    }
+    // Create initial insert into AuditEntry table
+    auditSql = 'INSERT INTO AuditEntry (USER_ID, AUDIT_TYPE, AUDIT_DATE) VALUES (?, "Password Change", CURDATE())'
+    connection.query(auditSql, [USER_ID], (error, results) => {
+        if (error) {
+            console.error('Error inserting item into AuditEntry table :', error);
+            return res.status(500).json({ error: 'Internal Server Error' });
+        } else {
+            console.log('AuditEntry item added successfully:', results);
+        }
+    // Insert into password audit table
+        loginSql = 'INSERT INTO PASSAUDIT (AUDIT_ID, AUDIT_USER, AUDIT_CHANGE_TYPE) VALUES (?,?,?)'
+        const AUDIT_ID = results.insertId;
+
+        connection.query(loginSql, [AUDIT_ID, AUDIT_USER_ID, REASON], (error, results) => {
+            if (error) {
+                console.error('Error inserting item into log in tables :', error);
+                return res.status(500).json({ error: 'Internal Server Error' });
+            } else {
+                console.log('Password change attempt added successfully:', results);
+                return res.status(200).json({ message: 'Password change added successfully' });
+            }
+        });
+    });
+
+});
+
+// Takes in a new log in attempt for the audit table
+app.post('/login_attempt',(req, res)=>{
+    const {USERNAME, SUCCESS} = req.body;
+    if(!USERNAME)
+    {
+        return res.status(400).json({ error: 'MISSING FIELD: USERNAME' });
+    }
+    if(SUCCESS === null)
+    {
+        return res.status(400).json({ error: 'MISSING FIELD: SUCCESS' });
+    }
+    // Create initial insert into AuditEntry table
+    auditSql = 'INSERT INTO AuditEntry (USER_ID, AUDIT_TYPE, AUDIT_DATE) VALUES (NULL, "Log in attempt", CURDATE())'
+    connection.query(auditSql, (error, results) => {
+        if (error) {
+            console.error('Error inserting item into AuditEntry table :', error);
+            return res.status(500).json({ error: 'Internal Server Error' });
+        } else {
+            console.log('AuditEntry item added successfully:', results);
+        }
+    // Insert into log in table
+        loginSql = 'INSERT INTO LOGINAUDIT (AUDIT_ID, AUDIT_USERNAME, AUDIT_STATUS) VALUES (?,?,?)'
+        const AUDIT_ID = results.insertId;
+
+        connection.query(loginSql, [AUDIT_ID, USERNAME, SUCCESS], (error, results) => {
+            if (error) {
+                console.error('Error inserting item into log in tables :', error);
+                return res.status(500).json({ error: 'Internal Server Error' });
+            } else {
+                console.log('Log in attepmt added successfully:', results);
+                return res.status(200).json({ message: 'Log in attempt added successfully' });
+            }
+        });
+    });
+
+});
+
 app.patch('/sponsors/:SPONSOR_ID',(req,res) => {
     const SPONSOR_ID = req.params.SPONSOR_ID;
     const {SPONSOR_NAME, POINT_MULTIPLIER} = req.body;
@@ -594,148 +785,7 @@ app.patch('/applications/:USER_ID/:SPONSOR_ID', (req,res) => {
         return res.json({ message: 'Application updated successfully'});
     });
 })
-// Takes in a new sponsor to Sponsors table
-app.post('/sponsors', (req, res) => {
-    const { SPONSOR_ADMIN_ID, USER_ID } = req.body; // Assuming you have SPONSOR_ADMIN_ID and USER_ID in the request body
 
-    // Check if required fields are provided
-    if (!SPONSOR_ADMIN_ID || !USER_ID) {
-        return res.status(400).json({ error: 'Missing required fields' });
-    }
-
-    // SQL query to fetch sponsorId based on admin's userId
-    const sponsorIDQuery = 'SELECT SPONSOR_ID FROM Sponsors WHERE USER_ID = ?';
-
-    // Execute the query
-    connection.query(sponsorIDQuery, [SPONSOR_ADMIN_ID], (error, results) => {
-        if (error) {
-            console.error('Error fetching sponsor ID:', error);
-            return res.status(500).json({ error: 'Internal Server Error' });
-        }
-
-        if (results.length === 0) {
-            return res.status(404).json({ error: 'Sponsor admin not found' });
-        }
-
-        const sponsorId = results[0].sponsorId;
-
-        // SQL query to insert data into the Sponsors table
-        const insertSponsorQuery = 'INSERT INTO Sponsors (USER_ID, SPONSOR_ID) VALUES (?, ?)';
-
-        // Execute the query to insert new sponsor
-        connection.query(insertSponsorQuery, [USER_ID, sponsorId], (error, insertResults) => {
-            if (error) {
-                console.error('Error inserting sponsor:', error);
-                return res.status(500).json({ error: 'Internal Server Error' });
-            }
-
-            res.json({ message: 'Sponsor account created successfully', result: insertResults });
-        });
-    });
-});
-
-// Takes in a new item to the catalog
-app.post('/catalog',(req, res) =>{
-    const {ITEM_ID, SPONSOR_ID} = req.body;
-    if(!SPONSOR_ID)
-    {
-        return res.status(400).json({ error: 'MISSING FIELD: SPONSOR_ID' });
-    }
-    if(!ITEM_ID)
-    {
-        return res.status(400).json({ error: 'MISSING FIELD: ITEM_ID' });
-    }
-    sql = `INSERT INTO CATALOG (ITEM_ID, SPONSOR_ID) VALUES (?, ?)`
-    connection.query(sql, [ITEM_ID, SPONSOR_ID], (error, results) => {
-        if (error) {
-            console.error('Error inserting item into catalog :', error);
-            return res.status(500).json({ error: 'Internal Server Error' });
-        } else {
-            console.log('Catalog item added successfully:', results);
-            return res.status(200).json({ message: 'Item added successfully' });
-        }
-    });
-});
-// Takes in application change for Audit Table
-// app.post('/application_change') NEEDS WORK
-
-// Takes in a new password change
-app.post('/password_change',(req, res)=>{
-    const {USER_ID, AUDIT_USER_ID, REASON} = req.body;
-    if(!USER_ID)
-    {
-        return res.status(400).json({ error: 'MISSING FIELD: USER_ID' });
-    }
-    if(!AUDIT_USER_ID)
-    {
-        return res.status(400).json({ error: 'MISSING FIELD: AUDIT_USER_ID' });
-    }
-    if(!REASON)
-    {
-        return res.status(400).json({ error: 'MISSING FIELD: REASON' });
-    }
-    // Create initial insert into AuditEntry table
-    auditSql = 'INSERT INTO AuditEntry (USER_ID, AUDIT_TYPE, AUDIT_DATE) VALUES (?, "Password Change", CURDATE())'
-    connection.query(auditSql, [USER_ID], (error, results) => {
-        if (error) {
-            console.error('Error inserting item into AuditEntry table :', error);
-            return res.status(500).json({ error: 'Internal Server Error' });
-        } else {
-            console.log('AuditEntry item added successfully:', results);
-        }
-    // Insert into log in table
-        loginSql = 'INSERT INTO PASSAUDIT (AUDIT_ID, AUDIT_USER, AUDIT_CHANGE_TYPE) VALUES (?,?,?)'
-        const AUDIT_ID = results.insertId;
-
-        connection.query(loginSql, [AUDIT_ID, AUDIT_USER_ID, REASON], (error, results) => {
-            if (error) {
-                console.error('Error inserting item into log in tables :', error);
-                return res.status(500).json({ error: 'Internal Server Error' });
-            } else {
-                console.log('Password chaned attepmt added successfully:', results);
-                return res.status(200).json({ message: 'Password change added successfully' });
-            }
-        });
-    });
-
-});
-
-// Takes in a new log in attempt
-app.post('/login_attempt',(req, res)=>{
-    const {USERNAME, SUCCESS} = req.body;
-    if(!USERNAME)
-    {
-        return res.status(400).json({ error: 'MISSING FIELD: USERNAME' });
-    }
-    if(SUCCESS === null)
-    {
-        return res.status(400).json({ error: 'MISSING FIELD: SUCCESS' });
-    }
-    // Create initial insert into AuditEntry table
-    auditSql = 'INSERT INTO AuditEntry (USER_ID, AUDIT_TYPE, AUDIT_DATE) VALUES (NULL, "Log in attempt", CURDATE())'
-    connection.query(auditSql, (error, results) => {
-        if (error) {
-            console.error('Error inserting item into AuditEntry table :', error);
-            return res.status(500).json({ error: 'Internal Server Error' });
-        } else {
-            console.log('AuditEntry item added successfully:', results);
-        }
-    // Insert into log in table
-        loginSql = 'INSERT INTO LOGINAUDIT (AUDIT_ID, AUDIT_USERNAME, AUDIT_STATUS) VALUES (?,?,?)'
-        const AUDIT_ID = results.insertId;
-
-        connection.query(loginSql, [AUDIT_ID, USERNAME, SUCCESS], (error, results) => {
-            if (error) {
-                console.error('Error inserting item into log in tables :', error);
-                return res.status(500).json({ error: 'Internal Server Error' });
-            } else {
-                console.log('Log in attepmt added successfully:', results);
-                return res.status(200).json({ message: 'Log in attempt added successfully' });
-            }
-        });
-    });
-
-});
 
 // HOME PAGE 
 app.get('/', (req, res) => {
