@@ -186,10 +186,10 @@ app.get('/sponsoraccounts', async (req, res) => {
     WITH A QUERY OF BOTH WILL RETURN SPECIFIC SPONSOR
 */
 app.get('/drivers', async (req, res) => {
-    const sponsorID = req.query.sponsorID;
-    const userID = req.query.userID;
+    const SPONSOR_ID = req.query.SPONSOR_ID;
+    const USER_ID = req.query.USER_ID;
     // RETURN ALL DRIVERS
-    if (!sponsorID && !userID) {
+    if (!SPONSOR_ID && !USER_ID) {
         query = 'SELECT * FROM DriverSponsorships';
         connection.query(query,(queryError, result)=> {
             if(queryError){
@@ -203,13 +203,13 @@ app.get('/drivers', async (req, res) => {
             }
         });
     }
-    else if (sponsorID && userID){
+    else if (SPONSOR_ID && USER_ID){
         // RETURNS SPECIFIC DRIVER ASSOCIATED WITH SPECIFIC SPONSOR
-        query = 'SELECT * FROM DriverSponsorships WHERE SPONSOR_ID = ' + sponsorID.toString() 
-                + 'AND WHERE USER_ID = ' + userID.toString();
+        query = 'SELECT * FROM DriverSponsorships WHERE SPONSOR_ID = ' + SPONSOR_ID.toString() 
+                + 'AND WHERE USER_ID = ' + USER_ID.toString();
         connection.query(query,(queryError, result)=> {
             if(queryError){
-                console.error('Error fetching drivers associated with ${sponsorID}:', queryError);
+                console.error(`Error fetching drivers associated with ${SPONSOR_ID}:`, queryError);
                 res.status(500).json({ error: 'Internal server error' });
                 return;
             }
@@ -219,12 +219,12 @@ app.get('/drivers', async (req, res) => {
             }
         });
     }
-    else if (sponsorID) {
+    else if (SPONSOR_ID) {
         // RETURNS ALL DRIVERs ASSOCIATED WITH SPECIFIC SPONSOR
-        query = 'SELECT * FROM DriverSponsorships WHERE SPONSOR_ID = ' + sponsorID.toString();
+        query = 'SELECT * FROM DriverSponsorships WHERE SPONSOR_ID = ' + SPONSOR_ID.toString();
         connection.query(query,(queryError, result)=> {
             if(queryError){
-                console.error('Error fetching drivers associated with ${sponsorID}:', queryError);
+                console.error(`Error fetching drivers associated with ${SPONSOR_ID}:`, queryError);
                 res.status(500).json({ error: 'Internal server error' });
                 return;
             }
@@ -234,16 +234,16 @@ app.get('/drivers', async (req, res) => {
             }
         });
     }
-    else if (userID){
+    else if (USER_ID){
         // RETURNS ALL SPONSORS ASSOCIATED WITH SPECIFIC DRIVER
         query  = `
         SELECT S.SPONSOR_ID, SPONSOR_NAME, POINTS
         FROM DriverSponsorships D
         JOIN SponsorCompany S ON D.SPONSOR_ID = S.SPONSOR_ID
-        WHERE USER_ID = ${userID}`
+        WHERE USER_ID = ${USER_ID}`
         connection.query(query,(queryError, result)=> {
             if(queryError){
-                console.error(`Error fetching sponsors associated with ${userID}:`, queryError);
+                console.error(`Error fetching sponsors associated with ${USER_ID}:`, queryError);
                 res.status(500).json({ error: 'Internal server error' });
                 return;
             }
@@ -258,10 +258,11 @@ app.get('/drivers', async (req, res) => {
 
 // get all sponsor applications
 app.get('/applications', async (req, res) => {
-    const sponsorID = req.query.sponsorID
+    const SPONSOR_ID = req.query.SPONSOR_ID
     const USER_ID = req.query.USER_ID;
+    
     // RETURN ALL APPLICATIONS
-    if (!sponsorID && !USER_ID) {
+    if (!SPONSOR_ID && !USER_ID) {
         query = 'SELECT * FROM Application';
         connection.query(query,(queryError, result)=> {
             if(queryError){
@@ -275,9 +276,10 @@ app.get('/applications', async (req, res) => {
             }
         });
     }
+
     // RETURNS A SPECIFIC APPLICATION BASED ON USER ID AND SPONSOR ID
-    else if(sponsorID && USER_ID){
-        query = 'SELECT * FROM Application WHERE SPONSOR_ID = ' + sponsorID.toString() + ' AND USER_ID = ' + USER_ID.toString();
+    else if(SPONSOR_ID && USER_ID){
+        query = 'SELECT * FROM Application WHERE SPONSOR_ID = ' + SPONSOR_ID.toString() + ' AND USER_ID = ' + USER_ID.toString();
         connection.query(query,(queryError, result)=> {
             if(queryError){
                 console.error('Error fetching application associated with ${sponsorID}:', queryError);
@@ -290,9 +292,10 @@ app.get('/applications', async (req, res) => {
             }
         });
     }
+
     // RETURNS ALL APPLICATIONs ASSOCIATED WITH SPECIFIC SPONSOR
-    else if (sponsorID){
-        query = 'SELECT * FROM Application WHERE SPONSOR_ID = ' + sponsorID.toString();
+    else if (SPONSOR_ID){
+        query = 'SELECT * FROM Application WHERE SPONSOR_ID = ' + SPONSOR_ID.toString();
         connection.query(query,(queryError, result)=> {
             if(queryError){
                 console.error('Error fetching application associated with ${sponsorID}:', queryError);
@@ -305,6 +308,7 @@ app.get('/applications', async (req, res) => {
             }
         });
     }
+
     // RETURNS ALL APPLICATIONS FOR SPECIFIC USER
     else if (USER_ID)
     {
@@ -564,7 +568,7 @@ app.patch('/drivers/:USER_ID/:SPONSOR_ID', (req, res) => {
 });
 
 // Updates Application Status
-app.patch('/application/:USER_ID/:SPONSOR_ID', (req,res) => {
+app.patch('/applications/:USER_ID/:SPONSOR_ID', (req,res) => {
     const USER_ID = req.params.USER_ID;
     const SPONSOR_ID = req.params.SPONSOR_ID;
     const {STATUS, REASON} = req.body;
