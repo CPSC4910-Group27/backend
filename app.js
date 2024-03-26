@@ -619,7 +619,18 @@ app.post('/login_attempt',(req, res)=>{
             return res.status(500).json({ error: 'Internal Server Error' });
         } else {
             console.log('AuditEntry item added successfully:', results);
-            return res.status(200).json({ message: 'Entry added successfully', results: results });
+        }
+    });
+    // Insert into log in table
+    const AUDIT_ID = results.insertId;
+    loginSql = 'INSERT INTO LOGINAUDIT (AUDIT_ID, AUDIT_USERNAME, AUDIT_STATUS VALUES (?,?,?)'
+    connection.query(loginSql, [AUDIT_ID, USERNAME, SUCCESS], (error, results) => {
+        if (error) {
+            console.error('Error inserting item into log in tables :', error);
+            return res.status(500).json({ error: 'Internal Server Error' });
+        } else {
+            console.log('Log in attepmt added successfully:', results);
+            return res.status(200).json({ message: 'Log in attempt added successfully' });
         }
     });
 });
