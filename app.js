@@ -599,6 +599,31 @@ app.post('/catalog',(req, res) =>{
         }
     });
 });
+
+// Takes in a new log in attempt
+app.post('/login_attempt',(req, res)=>{
+    const {USERNAME, SUCCESS} = req.body;
+    if(!USERNAME)
+    {
+        return res.status(400).json({ error: 'MISSING FIELD: USERNAME' });
+    }
+    if(!SUCCESS)
+    {
+        return res.status(400).json({ error: 'MISSING FIELD: SUCCESS' });
+    }
+    // Create initial insert into AuditEntry table
+    auditSql = 'INSERT INTO AuditEntry (USER_ID, AUDIT_TYPE, AUDIT_DATE) VALUES (NULL, "Log in attempt", CURDATE())'
+    connection.query(auditSql, (error, results) => {
+        if (error) {
+            console.error('Error inserting item into AuditEntry table :', error);
+            return res.status(500).json({ error: 'Internal Server Error' });
+        } else {
+            console.log('AuditEntry item added successfully:', results);
+            return res.status(200).json({ message: 'Entry added successfully', results: results });
+        }
+    });
+});
+
 // HOME PAGE 
 app.get('/', (req, res) => {
   res.send('Hello, Express!');
