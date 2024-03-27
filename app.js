@@ -446,7 +446,7 @@ app.post('/drivers', (req, res) => {
     const sql = 'INSERT INTO DriverSponsorships (USER_ID, SPONSOR_ID, POINTS) VALUES (?,?,0)';
 
     // Execute the query
-    connection.query(sql, [USER_ID, SPONSOR_ID], (error, res) => {
+    connection.query(sql, [USER_ID, SPONSOR_ID], (error, results) => {
         if (error) {
             console.error('Error executing query:', error);
             return res.status(500).json({ error: 'Internal Server Error' });
