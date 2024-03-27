@@ -837,6 +837,30 @@ app.patch('/applications/:USER_ID/:SPONSOR_ID', (req,res) => {
     });
 })
 
+// Updates Driver's Points
+app.patch('/drivers/:USER_ID/:SPONSOR_ID', (req,res) => {
+    const USER_ID = req.params.USER_ID;
+    const SPONSOR_ID = req.params.SPONSOR_ID;
+    const {POINTS} = req.body;
+    if (POINTS === undefined) {
+        return res.status(400).json({ error: 'Missing Field: POINTS' });
+    }
+    const sql = 'UPDATE DriverSponsorships SET POINTS = ? WHERE USER_ID = ? AND SPONSOR_ID = ?';
+    const values = [POINTS, USER_ID, SPONSOR_ID];    
+    connection.query(sql, values, (error, results) => {
+        if (error) {
+            console.error('Error updating driver:', error);
+            return res.status(500).json({ error: 'Internal Server Error' });
+        }
+        
+        if (results.affectedRows === 0) {
+            return res.status(404).json({ error: 'Application not found' });
+        }
+        
+        // Send a success response
+        return res.json({ message: 'Application updated successfully'});
+    });
+})
 
 // HOME PAGE 
 app.get('/', (req, res) => {
