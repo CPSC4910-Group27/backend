@@ -520,6 +520,54 @@ app.post('/catalog',(req, res) =>{
     });
 });
 
+//Takes in new changes for points audit table
+app.post('/point_change',(req,res) =>{
+    const {USER_ID, SPONSOR_ID, DRIVER_ID, POINT_TOTAL, REASON} = req.body;
+    if(!USER_ID)
+    {
+        return res.status(400).json({ error: 'MISSING FIELD: USER_ID' });
+    }
+    if(!SPONSOR_ID)
+    {
+        return res.status(400).json({ error: 'MISSING FIELD: SPONSOR_ID' });
+    }
+    if(!REASON)
+    {
+        return res.status(400).json({ error: 'MISSING FIELD: REASON' });
+    }
+    if(!POINT_TOTAL)
+    {
+        return res.status(400).json({ error: 'MISSING FIELD: POINT_TOTAL' });
+    }
+    if(!DRIVER_ID)
+    {
+        return res.status(400).json({ error: 'MISSING FIELD: DRIVER_ID' });
+    }
+
+    // Create initial insert into AuditEntry table
+    auditSql = 'INSERT INTO AuditEntry (USER_ID, AUDIT_TYPE, AUDIT_DATE) VALUES (?, "Driver Application", CURRENT_TIMESTAMP())'
+    connection.query(auditSql, [USER_ID], (error, results) => {
+        if (error) {
+            console.error('Error inserting item into AuditEntry table :', error);
+            return res.status(500).json({ error: 'Internal Server Error' });
+        } else {
+            console.log('AuditEntry item added successfully:', results);
+        }
+    // Insert into log in table
+        loginSql = 'INSERT INTO POINTAUDIT (AUDIT_ID, AUDIT_SPONSOR, AUDIT_DRIVER, AUDIT_POINTS, AUDIT_REASON) VALUES (?,?,?,?,?)'
+        const AUDIT_ID = results.insertId;
+
+        connection.query(loginSql, [AUDIT_ID, SPONSOR_ID, DRIVER_ID, POINT_TOTAL, REASON], (error, results) => {
+            if (error) {
+                console.error('Error inserting item into point audit table :', error);
+                return res.status(500).json({ error: 'Internal Server Error' });
+            } else {
+                console.log('Driver points added successfully:', results);
+                return res.status(200).json({ message: 'Driver points audited successfully' });
+            }
+        });
+    });
+})
 
 // Takes in application change for Audit Table
 app.post('/application_change',(req,res) =>{
@@ -554,13 +602,13 @@ app.post('/application_change',(req,res) =>{
         } else {
             console.log('AuditEntry item added successfully:', results);
         }
-    // Insert into log in table
+    // Insert into application audit table
         loginSql = 'INSERT INTO APPAUDIT (AUDIT_ID, AUDIT_SPONSOR, AUDIT_DRIVER, AUDIT_STATUS, AUDIT_REASON) VALUES (?,?,?,?,?)'
         const AUDIT_ID = results.insertId;
 
         connection.query(loginSql, [AUDIT_ID, SPONSOR_ID, DRIVER_ID, STATUS, REASON], (error, results) => {
             if (error) {
-                console.error('Error inserting item into log in tables :', error);
+                console.error('Error inserting item into application audit table :', error);
                 return res.status(500).json({ error: 'Internal Server Error' });
             } else {
                 console.log('Driver application added successfully:', results);
@@ -600,7 +648,7 @@ app.post('/password_change',(req, res)=>{
 
         connection.query(loginSql, [AUDIT_ID, AUDIT_USER_ID, REASON], (error, results) => {
             if (error) {
-                console.error('Error inserting item into log in tables :', error);
+                console.error('Error inserting item into password change tables :', error);
                 return res.status(500).json({ error: 'Internal Server Error' });
             } else {
                 console.log('Password change attempt added successfully:', results);
