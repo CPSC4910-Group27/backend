@@ -431,7 +431,7 @@ app.get('/point_changes',(req, res) => {
     const SPONSOR_ID = req.query.SPONSOR_ID;
     if(!USER_ID && !SPONSOR_ID)
     {
-        const query = `SELECT * FROM AuditEntry A JOIN LOGINAUDIT L ON L.AUDIT_ID = A.AUDIT_ID WHERE AUDIT_TYPE LIKE 'POINT CHANGE'`
+        const query = `SELECT * FROM AuditEntry A JOIN PASSAUDIT P ON P.AUDIT_ID = A.AUDIT_ID WHERE AUDIT_TYPE LIKE 'POINT CHANGE'`
         connection.query(query,(queryError, result)=> {
             if(queryError){
                 console.error(`Error fetching point changes:`, queryError);
@@ -447,9 +447,9 @@ app.get('/point_changes',(req, res) => {
     else if(SPONSOR_ID && USER_ID)
     {
         const query = `SELECT * 
-        FROM AuditEntry A JOIN LOGINAUDIT L ON L.AUDIT_ID = A.AUDIT_ID 
+        FROM AuditEntry A JOIN PASSAUDIT P ON P.AUDIT_ID = A.AUDIT_ID 
         WHERE AUDIT_TYPE LIKE 'POINT CHANGE'
-            AND L.USER_ID = ? AND SPONSOR_ID = ?`
+            AND P.USER_ID = ? AND SPONSOR_ID = ?`
         connection.query(query,[USER_ID,SPONSOR_ID],(queryError, result)=> {
             if(queryError){
                 console.error(`Error fetching point changes:`, queryError);
@@ -465,7 +465,7 @@ app.get('/point_changes',(req, res) => {
     else if(SPONSOR_ID)
     {
         const query = `SELECT * 
-        FROM AuditEntry A JOIN LOGINAUDIT L ON L.AUDIT_ID = A.AUDIT_ID 
+        FROM AuditEntry A JOIN PASSAUDIT P ON P.AUDIT_ID = A.AUDIT_ID 
         WHERE AUDIT_TYPE LIKE 'POINT CHANGE'
             AND SPONSOR_ID = ?`
         connection.query(query,[SPONSOR_ID],(queryError, result)=> {
@@ -483,9 +483,9 @@ app.get('/point_changes',(req, res) => {
     else if(USER_ID)
     {
         const query = `SELECT * 
-        FROM AuditEntry A JOIN LOGINAUDIT L ON L.AUDIT_ID = A.AUDIT_ID 
+        FROM AuditEntry A JOIN PASSAUDIT P ON P.AUDIT_ID = A.AUDIT_ID 
         WHERE AUDIT_TYPE LIKE 'POINT CHANGE'
-            AND L.USER_ID = ?`
+            AND P.USER_ID = ?`
         connection.query(query,[USER_ID],(queryError, result)=> {
             if(queryError){
                 console.error(`Error fetching point changes:`, queryError);
