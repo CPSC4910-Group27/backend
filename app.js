@@ -191,7 +191,7 @@ app.get('/drivers', async (req, res) => {
     const USER_ID = req.query.USER_ID;
     // RETURN ALL DRIVERS
     if (!SPONSOR_ID && !USER_ID) {
-        query = 'SELECT * FROM DriverSponsorships';
+        query = 'SELECT * FROM DriverSponsorships D JOIN Users U ON D.USER_ID = U.USER_ID';
         connection.query(query,(queryError, result)=> {
             if(queryError){
                 console.error('Error fetching drivers:', queryError);
@@ -206,7 +206,7 @@ app.get('/drivers', async (req, res) => {
     }
     else if (SPONSOR_ID && USER_ID){
         // RETURNS SPECIFIC DRIVER ASSOCIATED WITH SPECIFIC SPONSOR
-        query = 'SELECT * FROM DriverSponsorships WHERE SPONSOR_ID = ' + SPONSOR_ID.toString() 
+        query = 'SELECT * FROM DriverSponsorships D JOIN Users U on D.USER_ID = U.USER_ID WHERE SPONSOR_ID = ' + SPONSOR_ID.toString() 
                 + 'AND WHERE USER_ID = ' + USER_ID.toString();
         connection.query(query,(queryError, result)=> {
             if(queryError){
@@ -222,7 +222,7 @@ app.get('/drivers', async (req, res) => {
     }
     else if (SPONSOR_ID) {
         // RETURNS ALL DRIVERs ASSOCIATED WITH SPECIFIC SPONSOR
-        query = 'SELECT * FROM DriverSponsorships WHERE SPONSOR_ID = ' + SPONSOR_ID.toString();
+        query = 'SELECT * FROM DriverSponsorships D JOIN Users U ON D.USER_ID = U.USER_ID WHERE SPONSOR_ID = ' + SPONSOR_ID.toString();
         connection.query(query,(queryError, result)=> {
             if(queryError){
                 console.error(`Error fetching drivers associated with ${SPONSOR_ID}:`, queryError);
