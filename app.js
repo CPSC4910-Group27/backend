@@ -130,6 +130,7 @@ app.get('/sponsors', (req, res) => {
 app.get('/sponsoraccounts', async (req, res) => {
     const SPONSOR_ID = req.query.SPONSOR_ID;
     const USER_ID = req.query.USER_ID;
+
     // RETURN ALL SPONSOR ACCOUNTS
     if (!SPONSOR_ID && !USER_ID) {
         query = 'SELECT * FROM Sponsors';
@@ -147,7 +148,7 @@ app.get('/sponsoraccounts', async (req, res) => {
     }
     else if(SPONSOR_ID){
         // RETURNS ALL SPONSORS ASSOCIATED WITH SPECIFIC SPONSOR
-        query = 'SELECT * FROM Sponsors WHERE SPONSOR_ID = ' + SPONSOR_ID.toString();
+        query = 'SELECT * FROM Sponsors S JOIN USERS U on S.USER_ID = U.USER_ID WHERE SPONSOR_ID = ' + SPONSOR_ID.toString();
         connection.query(query,(queryError, result)=> {
             if(queryError){
                 console.error('Error fetching sponsors associated with ${USER_ID}:', queryError);
@@ -163,13 +164,13 @@ app.get('/sponsoraccounts', async (req, res) => {
     else if(USER_ID)
     {
         // RETURNS SPONSOR ASSOCIATED WITH SPECIFIC USER ID
-        query = 'SELECT * FROM Sponsors WHERE USER_ID = ?';
+        query = 'SELECT * FROM Sponsors S JOIN USERS U on S.USER_ID = U.USER_ID WHERE S.USER_ID = ?';
         connection.query(query, [USER_ID], (queryError, result) => {
-          if (queryError) {
+          if(queryError) {
             console.error(`Error fetching sponsors associated with ${USER_ID}:`, queryError);
             res.status(500).json({ error: 'Internal server error' });
             return;
-          } else {
+          }else{
             // Assuming you expect only one sponsor, use result[0]
             res.status(200).json(result[0]);
             return;
