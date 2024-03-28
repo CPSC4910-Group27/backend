@@ -424,6 +424,81 @@ app.get('/catalog',(req,res)=>{
         });
     }
 });
+
+// RETURNS POINT CHANGES
+app.get('/point_changes',(req, res) => {
+    const USER_ID = req.query.USER_ID;
+    const SPONSOR_ID = req.query.SPONSOR_ID;
+    if(!USER_ID && !SPONSOR_ID)
+    {
+        const query = `SELECT * FROM AuditEntry A JOIN LOGINAUDIT L ON L.AUDIT_ID = A.AUDIT_ID WHERE AUDIT_TYPE LIKE 'POINT CHANGE'`
+        connection.query(query,(queryError, result)=> {
+            if(queryError){
+                console.error(`Error fetching point changes:`, queryError);
+                res.status(500).json({ error: 'Internal server error' });
+                return;
+            }
+            else{
+                res.status(200).json(result);
+                return;
+            }
+        });
+    }
+    else if(SPONSOR_ID && USER_ID)
+    {
+        const query = `SELECT * 
+        FROM AuditEntry A JOIN LOGINAUDIT L ON L.AUDIT_ID = A.AUDIT_ID 
+        WHERE AUDIT_TYPE LIKE 'POINT CHANGE'
+            AND L.USER_ID = ? AND SPONSOR_ID = ?`
+        connection.query(query,[USER_ID,SPONSOR_ID],(queryError, result)=> {
+            if(queryError){
+                console.error(`Error fetching point changes:`, queryError);
+                res.status(500).json({ error: 'Internal server error' });
+                return;
+            }
+            else{
+                res.status(200).json(result);
+                return;
+            }
+        });
+    }
+    else if(SPONSOR_ID)
+    {
+        const query = `SELECT * 
+        FROM AuditEntry A JOIN LOGINAUDIT L ON L.AUDIT_ID = A.AUDIT_ID 
+        WHERE AUDIT_TYPE LIKE 'POINT CHANGE'
+            AND SPONSOR_ID = ?`
+        connection.query(query,[SPONSOR_ID],(queryError, result)=> {
+            if(queryError){
+                console.error(`Error fetching point changes:`, queryError);
+                res.status(500).json({ error: 'Internal server error' });
+                return;
+            }
+            else{
+                res.status(200).json(result);
+                return;
+            }
+        });
+    }
+    else if(USER_ID)
+    {
+        const query = `SELECT * 
+        FROM AuditEntry A JOIN LOGINAUDIT L ON L.AUDIT_ID = A.AUDIT_ID 
+        WHERE AUDIT_TYPE LIKE 'POINT CHANGE'
+            AND L.USER_ID = ?`
+        connection.query(query,[USER_ID],(queryError, result)=> {
+            if(queryError){
+                console.error(`Error fetching point changes:`, queryError);
+                res.status(500).json({ error: 'Internal server error' });
+                return;
+            }
+            else{
+                res.status(200).json(result);
+                return;
+            }
+        });
+
+});
 // Takes in a new user for the database  
 app.post('/users', (req, res) => {
     const {USER_TYPE, EMAIL, USERNAME, FNAME, LNAME} = req.body;
@@ -607,7 +682,7 @@ app.post('/point_change',(req,res) =>{
     }
 
     // Create initial insert into AuditEntry table
-    auditSql = 'INSERT INTO AuditEntry (USER_ID, AUDIT_TYPE, AUDIT_DATE) VALUES (?, "Driver Application", CURRENT_TIMESTAMP())'
+    auditSql = 'INSERT INTO AuditEntry (USER_ID, AUDIT_TYPE, AUDIT_DATE) VALUES (?, "Point Change", CURRENT_TIMESTAMP())'
     connection.query(auditSql, [USER_ID], (error, results) => {
         if (error) {
             console.error('Error inserting item into AuditEntry table :', error);
