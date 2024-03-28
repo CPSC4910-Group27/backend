@@ -260,9 +260,10 @@ app.get('/drivers', async (req, res) => {
 app.get('/applications', async (req, res) => {
     const SPONSOR_ID = req.query.SPONSOR_ID
     const USER_ID = req.query.USER_ID;
+    const STATUS = req.query.STATUS;
 
     // RETURN ALL APPLICATIONS
-    if (!SPONSOR_ID && !USER_ID) {
+    if (!SPONSOR_ID && !USER_ID && !STATUS) {
         query = 'SELECT * FROM Application';
         connection.query(query,(queryError, result)=> {
             if(queryError){
@@ -277,10 +278,42 @@ app.get('/applications', async (req, res) => {
         });
     }
 
+    // RETURNS A SPECIFIC APPLICATION BASED ON USER ID AND SPONSOR ID AND STATUS
+    else if(SPONSOR_ID && USER_ID && STATUS){
+        query = 'SELECT * FROM Application WHERE SPONSOR_ID = ' + SPONSOR_ID.toString() + ' AND USER_ID = ' + USER_ID.toString() +' AND STATUS LIKE ?';
+        connection.query(query,[STATUS],(queryError, result)=> {
+            if(queryError){
+                console.error('Error fetching application associated with ${sponsorID}:', queryError);
+                res.status(500).json({ error: 'Internal server error' });
+                return;
+            }
+            else{
+                res.status(200).json(result);
+                return;
+            }
+        });
+    }
+
     // RETURNS A SPECIFIC APPLICATION BASED ON USER ID AND SPONSOR ID
     else if(SPONSOR_ID && USER_ID){
         query = 'SELECT * FROM Application WHERE SPONSOR_ID = ' + SPONSOR_ID.toString() + ' AND USER_ID = ' + USER_ID.toString();
         connection.query(query,(queryError, result)=> {
+            if(queryError){
+                console.error('Error fetching application associated with ${sponsorID}:', queryError);
+                res.status(500).json({ error: 'Internal server error' });
+                return;
+            }
+            else{
+                res.status(200).json(result);
+                return;
+            }
+        });
+    }
+
+    // RETURNS ALL APPLICATIONs ASSOCIATED WITH SPECIFIC SPONSOR AND STATUS
+    else if (SPONSOR_ID && STATUS){
+        query = 'SELECT * FROM Application WHERE SPONSOR_ID = ' + SPONSOR_ID.toString() + ' AND STATUS LIKE ?';
+        connection.query(query,[STATUS],(queryError, result)=> {
             if(queryError){
                 console.error('Error fetching application associated with ${sponsorID}:', queryError);
                 res.status(500).json({ error: 'Internal server error' });
@@ -308,6 +341,23 @@ app.get('/applications', async (req, res) => {
             }
         });
     }
+
+     // RETURNS ALL APPLICATIONS FOR SPECIFIC USER WITH A SPECIFIC STATUS
+     else if (USER_ID && STATUS)
+     {
+         query = 'SELECT * FROM Application WHERE USER_ID = ' + USER_ID.toString() + ' AND STATUS LIKE ?';
+         connection.query(query,[STATUS],(queryError, result)=> {
+             if(queryError){
+                 console.error('Error fetching application associated with ${sponsorID}:', queryError);
+                 res.status(500).json({ error: 'Internal server error' });
+                 return;
+             }
+             else{
+                 res.status(200).json(result);
+                 return;
+             }
+         });
+     }
 
     // RETURNS ALL APPLICATIONS FOR SPECIFIC USER
     else if (USER_ID)
