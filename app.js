@@ -497,6 +497,7 @@ app.get('/point_changes',(req, res) => {
                 return;
             }
         });
+    }
 
 });
 // Takes in a new user for the database  
