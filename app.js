@@ -4,6 +4,11 @@ const mysql = require('mysql');
 const cors = require('cors');
 const bodyParser = require('body-parser');
 const port = process.env.PORT || 3004;
+const http = require('http');
+const socketIo = require('socket.io');
+
+const server = http.createServer(app);
+const io = socketIo(server);
 
 // Configuring database connection
 const connection = mysql.createConnection({
@@ -46,6 +51,12 @@ app.get('/about', (req, res) => {
         }
     })
 });
+app.get('/serverport',(req,res) => {
+    res.status(200).json({
+        "PORT": port
+    });
+    return;
+})
 
 // Gets all users or certain user based on username given
 app.get('/users', (req, res) => {
@@ -834,11 +845,14 @@ app.patch('/users/:USER_ID',(req,res) =>{
 app.patch('/drivers/:USER_ID/:SPONSOR_ID', (req, res) => {
     const USER_ID = req.params.USER_ID;
     const SPONSOR_ID = req.params.SPONSOR_ID;
-    const { POINTS } = req.body;
+    const { POINTS, REASON } = req.body;
     
     // Check if at least one field is provided for update
     if (POINTS === undefined) {
         return res.status(400).json({ error: 'Missing Field: POINTS' });
+    }
+    if (REASON === undefined) {
+        return res.status(400).json({ error: 'Missing Field: REASON' });
     }
     
     // SQL query to update driver's information
@@ -854,7 +868,7 @@ app.patch('/drivers/:USER_ID/:SPONSOR_ID', (req, res) => {
         if (results.affectedRows === 0) {
             return res.status(404).json({ error: 'Driver not found' });
         }
-        
+        io.emit('driverPointsUpdated', { DRIVER_ID: USER_ID, POINTS: POINTS, SPONSOR_ID: SPONSOR_ID, REASON: REASON});
         // Send a success response
         return res.json({ message: 'Driver point information updated successfully'});
     });
