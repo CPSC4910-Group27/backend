@@ -426,7 +426,7 @@ app.get('/catalog',(req,res)=>{
 });
 
 // RETURNS POINT CHANGES
-app.get('/point_changes',(req, res) => {
+app.get('/point_change',(req, res) => {
     const USER_ID = req.query.USER_ID;
     const SPONSOR_ID = req.query.SPONSOR_ID;
     if(!USER_ID && !SPONSOR_ID)
