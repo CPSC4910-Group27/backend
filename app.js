@@ -449,7 +449,7 @@ app.get('/point_change',(req, res) => {
         const query = `SELECT * 
         FROM AuditEntry A JOIN POINTAUDIT P ON P.AUDIT_ID = A.AUDIT_ID 
         WHERE AUDIT_TYPE LIKE 'POINT CHANGE'
-            AND P.USER_ID = ? AND SPONSOR_ID = ?`
+            AND P.AUDIT_DRIVER = ? AND AUDIT_SPONSOR = ?`
         connection.query(query,[USER_ID,SPONSOR_ID],(queryError, result)=> {
             if(queryError){
                 console.error(`Error fetching point changes:`, queryError);
@@ -467,7 +467,7 @@ app.get('/point_change',(req, res) => {
         const query = `SELECT * 
         FROM AuditEntry A JOIN POINTAUDIT P ON P.AUDIT_ID = A.AUDIT_ID 
         WHERE AUDIT_TYPE LIKE 'POINT CHANGE'
-            AND SPONSOR_ID = ?`
+            AND AUDIT_SPONSOR = ?`
         connection.query(query,[SPONSOR_ID],(queryError, result)=> {
             if(queryError){
                 console.error(`Error fetching point changes:`, queryError);
@@ -485,7 +485,7 @@ app.get('/point_change',(req, res) => {
         const query = `SELECT * 
         FROM AuditEntry A JOIN POINTAUDIT P ON P.AUDIT_ID = A.AUDIT_ID 
         WHERE AUDIT_TYPE LIKE 'POINT CHANGE'
-            AND P.USER_ID = ?`
+            AND P.AUDIT_DRIVER = ?`
         connection.query(query,[USER_ID],(queryError, result)=> {
             if(queryError){
                 console.error(`Error fetching point changes:`, queryError);
