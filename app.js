@@ -148,7 +148,7 @@ app.get('/sponsoraccounts', async (req, res) => {
     }
     else if(SPONSOR_ID){
         // RETURNS ALL SPONSORS ASSOCIATED WITH SPECIFIC SPONSOR
-        query = 'SELECT * FROM Sponsors S JOIN USERS U on S.USER_ID = U.USER_ID WHERE SPONSOR_ID = ' + SPONSOR_ID.toString();
+        query = 'SELECT * FROM Sponsors S JOIN Users U on S.USER_ID = U.USER_ID WHERE SPONSOR_ID = ' + SPONSOR_ID.toString();
         connection.query(query,(queryError, result)=> {
             if(queryError){
                 console.error('Error fetching sponsors associated with ${USER_ID}:', queryError);
@@ -164,7 +164,7 @@ app.get('/sponsoraccounts', async (req, res) => {
     else if(USER_ID)
     {
         // RETURNS SPONSOR ASSOCIATED WITH SPECIFIC USER ID
-        query = 'SELECT * FROM Sponsors S JOIN USERS U on S.USER_ID = U.USER_ID WHERE S.USER_ID = ?';
+        query = 'SELECT * FROM Sponsors S JOIN Users U on S.USER_ID = U.USER_ID WHERE S.USER_ID = ?';
         connection.query(query, [USER_ID], (queryError, result) => {
           if(queryError) {
             console.error(`Error fetching sponsors associated with ${USER_ID}:`, queryError);
