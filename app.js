@@ -56,11 +56,27 @@ app.get('/about', (req, res) => {
         }
     })
 });
+
 app.get('/serverport',(req,res) => {
     res.status(200).json({
         "PORT": port
     });
     return;
+})
+
+//get all admin users
+app.get('/admins', (req, res) => {
+    query = 'SELECT * FROM Admins A JOIN Users U ON A.USER_ID = U.USER_ID'
+    connection.query(query,(queryError, result) => {
+        if (queryError) {
+            console.error('Error executing query:', queryError);
+            res.status(500).json({ error: 'Internal Server Error' });
+            return;
+        } else {
+            res.status(200).json(result[0]);
+            return;
+        }
+    })
 })
 
 // Gets all users or certain user based on username given
@@ -149,7 +165,7 @@ app.get('/sponsoraccounts', async (req, res) => {
 
     // RETURN ALL SPONSOR ACCOUNTS
     if (!SPONSOR_ID && !USER_ID) {
-        query = 'SELECT * FROM Sponsors';
+        query = 'SELECT * FROM Sponsors S JOIN Users U on S.USER_ID = U.USER_ID' ;
         connection.query(query,(queryError, result)=> {
             if(queryError){
                 console.error('Error fetching sponsors:', queryError);
