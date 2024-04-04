@@ -431,7 +431,7 @@ app.get('/catalog',(req,res)=>{
             }
         });
     }
-    if(challenge_code){
+    if(challengeCode){
         const hash = crypto.createHash('sha256');
         const endpoint = 'https://team27-express.cpsc4911.com/catalog';
         const verificationToken = aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa;
