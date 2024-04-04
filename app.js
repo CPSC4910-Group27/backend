@@ -6,6 +6,7 @@ const bodyParser = require('body-parser');
 const port = process.env.PORT || 3004;
 const http = require('http');
 const socketIo = require('socket.io');
+const crypto = require('crypto');
 
 const server = http.createServer(app);
 const io = socketIo(server);
@@ -414,6 +415,7 @@ app.get('/applications', async (req, res) => {
 // OR WILL RETURN ALL ITEMS ASSOCIATED WITH A SPECIFIC SPONSOR
 app.get('/catalog',(req,res)=>{
     const SPONSOR_ID = req.query.SPONSOR_ID;
+    const challengeCode = req.query.challenge_code;
     // RETURNS ALL CATALOG ITEMS ASSOCIATED WITH A SPECIFIC SPONSOR
     if(SPONSOR_ID){
         sql = `SELECT * FROM CATALOG WHERE SPONSOR_ID = ${SPONSOR_ID}`
@@ -429,6 +431,21 @@ app.get('/catalog',(req,res)=>{
             }
         });
     }
+    if(challenge_code){
+        const hash = crypto.createHash('sha256');
+        const endpoint = 'https://team27-express.cpsc4911.com/catalog';
+        const verificationToken = aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa;
+        hash.update(challengeCode);
+        hash.update(verificationToken);
+        hash.update(endpoint);
+        const responseHash = hash.digest('hex');
+        console.log(new Buffer.from(responseHash).toString());
+        
+        const challengeResponse = {
+            "challengeResponse": responseHash
+        };
+        res.status(200).json(challengeResponse);
+    }  
     // ELSE RETURN ALL CATALOG ITEMS
     else{
         sql = `SELECT * FROM CATALOG`
