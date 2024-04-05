@@ -330,7 +330,7 @@ app.get('/applications', async (req, res) => {
 
     // RETURNS A SPECIFIC APPLICATION BASED ON USER ID AND SPONSOR ID
     else if(SPONSOR_ID && USER_ID){
-        query = 'SELECT * FROM Application A JOIN Users U on A.USER_ID = U.USER_ID WHERE SPONSOR_ID = ' + SPONSOR_ID.toString() + ' AND USER_ID = ' + USER_ID.toString();
+        query = 'SELECT * FROM Application A JOIN Users U on A.USER_ID = U.USER_ID WHERE SPONSOR_ID = ' + SPONSOR_ID.toString() + ' AND A.USER_ID = ' + USER_ID.toString();
         connection.query(query,(queryError, result)=> {
             if(queryError){
                 console.error('Error fetching application associated with ${sponsorID}:', queryError);
