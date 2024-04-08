@@ -914,7 +914,7 @@ app.patch('/sponsors/:SPONSOR_ID',(req,res) => {
 // Updates a users information and assigns them to the sponsors table
 app.patch('/users/:USER_ID',(req,res) =>{
     const USER_ID = req.params.USER_ID;
-    const {SPONSOR_ID, USER_TYPE} = req.body;
+    const {FNAME, LNAME} = req.body;
     console.log("USER_ID",USER_ID);
     console.log("SPONSOR ID ", SPONSOR_ID," USER TYPE ", USER_TYPE);
     if(USER_ID === undefined)
@@ -922,18 +922,16 @@ app.patch('/users/:USER_ID',(req,res) =>{
         console.log('No USER_ID provided in query')
         return res.status(400).json({ error: 'No USER_ID provided in query' });
     }
-    if(!USER_TYPE)
+    
+    if(!FNAME && !LNAME)
     {
-        console.log('No USER_TYPE to change too')
-        return res.status(400).json({ error: 'No USER_TYPE to change too' });
+        console.log('No fields to update')
+        return res.status(400).json({ error: 'No fields to update' });
     }
-    if(!SPONSOR_ID)
-    {
-        console.log('No SPONSOR_ID to assign')
-        return res.status(400).json({ error: 'No SPONSOR_ID to assign' });
-    }
-    const users_sql = `UPDATE Users SET USER_TYPE = ? WHERE USER_ID = ?`;
-    connection.query(users_sql,[USER_TYPE,USER_ID], (error, results) => {
+
+    if(FNAME){
+        const fname_sql = `UPDATE Users SET FNAME = ? WHERE USER_ID = ?`;
+        connection.query(fname_sql,[FNAME,USER_ID], (error, results) => {
         if (error) {
             console.error('Error updating user:', error);
             return res.status(500).json({ error: 'Internal Server Error' });
@@ -941,16 +939,20 @@ app.patch('/users/:USER_ID',(req,res) =>{
             console.log('User updated successfully:', results);
         }
     });
-    const insertSponsorSQL = 'INSERT INTO Sponsors (USER_ID, SPONSOR_ID) VALUES (?, ?)';
-    connection.query(insertSponsorSQL, [USER_ID, SPONSOR_ID], (error, results) => {
+    }
+
+    if(LNAME){
+        const lname_sql = `UPDATE Users SET FNAME = ? WHERE USER_ID = ?`;
+        connection.query(lname_sql, [LNAME, USER_ID], (error, results) => {
         if (error) {
             console.error('Error updating user:', error);
             return res.status(500).json({ error: 'Internal Server Error' });
         } else {
             console.log('User updated successfully:', results);
-            return res.status(200).json({ message: 'User and Sponsor updated successfully' });
         }
     });
+    }
+    return res.status(200).json({ message: 'User and Sponsor updated successfully' });
 });
 
 // Updates a drivers point value with a specific company
