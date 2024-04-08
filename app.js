@@ -11,6 +11,9 @@ const crypto = require('crypto');
 const server = http.createServer(app);
 const io = socketIo(server);
 
+// Cross Origin (DO NOT DELETE)
+app.use(cors());
+
 // Configuring database connection
 const connection = mysql.createConnection({
     host: process.env.RDS_HOSTNAME,
@@ -29,8 +32,7 @@ connection.connect((err) => {
     }
 });
 
-// Cross Origin (DO NOT DELETE)
-app.use(cors());
+
 
 
 // Allows us to parse json responses (DO NOT DELETE)  
@@ -427,7 +429,7 @@ app.get('/catalog',(req,res)=>{
             }
         });
     }
-    if(challengeCode){
+    else if(challengeCode){
         const hash = crypto.createHash('sha256');
         const endpoint = 'https://team27-express.cpsc4911.com/catalog';
         const verificationToken = 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa';
