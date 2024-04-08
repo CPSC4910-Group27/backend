@@ -940,7 +940,7 @@ app.patch('/users/:USER_ID',(req,res) =>{
     }
 
     if(LNAME){
-        const lname_sql = `UPDATE Users SET FNAME = ? WHERE USER_ID = ?`;
+        const lname_sql = `UPDATE Users SET LNAME = ? WHERE USER_ID = ?`;
         connection.query(lname_sql, [LNAME, USER_ID], (error, results) => {
         if (error) {
             console.error('Error updating user:', error);
