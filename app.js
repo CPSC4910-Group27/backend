@@ -656,7 +656,7 @@ app.post('/sponsors', (req, res) => {
             return res.status(404).json({ error: 'Sponsor admin not found' });
         }
 
-        const sponsorId = results[0].sponsorId;
+        const sponsorId = results[0].SPONSOR_ID;
 
         // SQL query to insert data into the Sponsors table
         const insertSponsorQuery = 'INSERT INTO Sponsors (USER_ID, SPONSOR_ID) VALUES (?, ?)';
