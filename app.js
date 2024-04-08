@@ -82,21 +82,24 @@ app.get('/admins', (req, res) => {
 app.get('/users', (req, res) => {
     const username = req.query.USERNAME;
     const USER_TYPE = req.query.USER_TYPE;
-    if (!username && !USER_TYPE) {
+    const EMAIL = req.query.EMAIL;
+    if (!username && !USER_TYPE && !EMAIL){
         query = 'SELECT * FROM Users'
     }
-    else if (username)
-    {
+    else if (username){
         query = "SELECT * FROM Users WHERE USERNAME = '" + username.toString() + "'";    
     }
-    else if (USER_TYPE)
-    {
+    else if (USER_TYPE){
         query = "SELECT * FROM Users WHERE USER_TYPE = '" + USER_TYPE.toString() + "'"; 
+    }
+    else if (EMAIL){
+        query = "SELECT * FROM Users WHERE EMAIL LIKE '" + EMAIL.toString() + "'"; 
     }
     else{
             res.status(400).json({ error: 'Missing Query Params' });
             return;
-        }
+    }
+
     connection.query(query,(queryError, result) => {
         if (queryError) {
             console.error('Error executing query:', queryError);
@@ -116,6 +119,10 @@ app.get('/users', (req, res) => {
         else if(USER_TYPE)
         {
             res.status(200).json(result);
+        }
+        else if(EMAIL)
+        {
+            res.status(200).json(result[0]);
         }
     });
 });
