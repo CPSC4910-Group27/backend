@@ -663,7 +663,7 @@ app.post('/sponsors', (req, res) => {
     if (!USER_ID || (!SPONSOR_ADMIN_ID && !SPONSOR_COMPANY_ID)) {
         return res.status(400).json({ error: 'Missing required fields' });
     }
-    const sponsorId = null;
+    let sponsorId = null;
     // If the admins user ID is given, the must get the associated company ID
     if(SPONSOR_ADMIN_ID){
         const sponsorIDQuery = 'SELECT SPONSOR_ID FROM Sponsors WHERE USER_ID = ?';
