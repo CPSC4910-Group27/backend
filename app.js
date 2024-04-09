@@ -638,6 +638,23 @@ app.post('/drivers', (req, res) => {
     });
 });
 
+//Adds new admin to database
+app.post('/admins',(req,res)=> {
+    const USER_ID = req.body;
+
+    if(!USER_ID){
+        return res.status(400).json({error: 'Missing USER_ID'});
+    }
+    const adminQuery = `INSERT INTO Admins (USER_ID) VALUES (?)`
+    connection.query(adminQuery, [USER_ID] , (error, results) => {
+        if(error){
+            console.error('Error executing query:', error);
+            return res.status(500).json({ error: 'Internal Server Error' });
+        }
+        res.json({ message: 'Admin added successfully'});
+    })
+})
+
 // Takes in a new sponsor to Sponsors table
 app.post('/sponsors', (req, res) => {
     const { SPONSOR_ADMIN_ID, USER_ID } = req.body; // Assuming you have SPONSOR_ADMIN_ID and USER_ID in the request body
