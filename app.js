@@ -645,8 +645,8 @@ app.post('/admins',(req,res)=> {
     if(!USER_ID){
         return res.status(400).json({error: 'Missing USER_ID'});
     }
-    const adminQuery = `INSERT INTO Admins (USER_ID) VALUES (?)`
-    connection.query(adminQuery, [USER_ID] , (error, results) => {
+    const adminQuery = `INSERT INTO Admins (USER_ID) VALUES (${USER_ID})`
+    connection.query(adminQuery, (error, results) => {
         if(error){
             console.error('Error executing query:', error);
             return res.status(500).json({ error: 'Internal Server Error' });
