@@ -1039,6 +1039,21 @@ app.patch('/applications/:USER_ID/:SPONSOR_ID', (req,res) => {
     });
 })
 
+app.delete('/catalog/:CATALOG_ID',(req,res) => {
+    const CATALOG_ID = req.params.CATALOG_ID;
+    if(CATALOG_ID === undefined){
+        return res.status(400).json({error: 'Missing Catalog ID'});
+    }
+    const sql = `DELETE FROM CATALOG WHERE CATALOG_ID = ?`;
+    connection.query(sql, CATALOG_ID, (error,results) => {
+        if(error){
+            console.error('Error removing catalog item');
+            return res.status(500).json({ error: 'Internal Server Error' });
+        }
+        return res.status(200).json({ message: 'Item removed successfully' })
+    });
+})
+
 // Remove Driver from DriverSponsorships Table
 app.delete('/drivers/:USER_ID/:SPONSOR_ID', (req, res) => {
     const USER_ID = req.params.USER_ID;
