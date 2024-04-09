@@ -994,7 +994,7 @@ app.patch('/drivers/:USER_ID/:SPONSOR_ID', (req, res) => {
     }
     
     // SQL query to update driver's information
-    const sql = `UPDATE DriverSponsorships SET POINTS = POINTS + ${POINTS} WHERE USER_ID = ${USER_ID} AND SPONSOR_ID = ${SPONSOR_ID}`;
+    const sql = `UPDATE DriverSponsorships SET POINTS = ${POINTS} WHERE USER_ID = ${USER_ID} AND SPONSOR_ID = ${SPONSOR_ID}`;
     
     // Execute the query
     connection.query(sql, (error, results) => {
