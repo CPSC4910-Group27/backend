@@ -640,7 +640,7 @@ app.post('/drivers', (req, res) => {
 
 //Adds new admin to database
 app.post('/admins',(req,res)=> {
-    const USER_ID = req.body;
+    const {USER_ID} = req.body;
 
     if(!USER_ID){
         return res.status(400).json({error: 'Missing USER_ID'});
