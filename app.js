@@ -516,7 +516,7 @@ app.delete('/catalog/:itemId', (req, res) => {
     const itemId = req.params.itemId;
   
     // Perform the delete operation in the database
-    const sql = `DELETE FROM CATALOG WHERE ITEM_ID = ${itemId}`;
+    const sql = `DELETE * FROM CATALOG WHERE ITEM_ID = ${itemId}`;
     connection.query(sql, (queryError, result) => {
       if (queryError) {
         console.error(`Error deleting item with ID ${itemId}:`, queryError);
@@ -531,7 +531,7 @@ app.delete('/catalog/:itemId', (req, res) => {
         res.status(200).json({ message: `Item with ID ${itemId} deleted successfully` });
       }
     });
-  });
+});
 
 // RETURNS POINT CHANGES
 app.get('/point_change',(req, res) => {
