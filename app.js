@@ -450,6 +450,7 @@ app.get('/applications', async (req, res) => {
 // OR WILL RETURN ALL ITEMS ASSOCIATED WITH A SPECIFIC SPONSOR
 app.get('/catalog',(req,res)=>{
     const SPONSOR_ID = req.query.SPONSOR_ID;
+    const ITEM_ID = req.query.ITEM_ID;
     const challengeCode = req.query.challenge_code;
     // RETURNS ALL CATALOG ITEMS ASSOCIATED WITH A SPECIFIC SPONSOR
     if(SPONSOR_ID){
@@ -457,6 +458,19 @@ app.get('/catalog',(req,res)=>{
         connection.query(sql,(queryError, result)=> {
             if(queryError){
                 console.error(`Error fetching catalog items associated with ${SPONSOR_ID}:`, queryError);
+                res.status(500).json({ error: 'Internal server error' });
+                return;
+            }
+            else{
+                res.status(200).json(result);
+                return;
+            }
+        });
+    } else if(ITEM_ID){
+        sql = `SELECT * FROM CATALOG WHERE ITEM_ID = ${ITEM_ID}`
+        connection.query(sql,(queryError, result)=> {
+            if(queryError){
+                console.error(`Error fetching catalog items associated with ${ITEM_ID}:`, queryError);
                 res.status(500).json({ error: 'Internal server error' });
                 return;
             }
