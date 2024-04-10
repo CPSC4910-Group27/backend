@@ -608,6 +608,113 @@ app.get('/point_change',(req, res) => {
     }
 
 });
+
+// RETURNS POINT CHANGES
+app.get('/application_change',(req, res) => {
+    const USER_ID = req.query.USER_ID;
+    const SPONSOR_ID = req.query.SPONSOR_ID;
+    if(!USER_ID && !SPONSOR_ID)
+    {
+        const query = `SELECT * FROM AuditEntry A JOIN APPAUDIT P ON P.AUDIT_ID = A.AUDIT_ID WHERE AUDIT_TYPE LIKE 'DRIVER APPPLICATION'`
+        connection.query(query,(queryError, result)=> {
+            if(queryError){
+                console.error(`Error fetching application changes:`, queryError);
+                res.status(500).json({ error: 'Internal server error' });
+                return;
+            }
+            else{
+                res.status(200).json(result);
+                return;
+            }
+        });
+    }
+    else if(SPONSOR_ID && USER_ID)
+    {
+        const query = `SELECT * 
+        FROM AuditEntry A JOIN APPAUDIT P ON P.AUDIT_ID = A.AUDIT_ID 
+        WHERE AUDIT_TYPE LIKE 'DRIVER APPLICATION'
+            AND P.AUDIT_DRIVER = ? AND AUDIT_SPONSOR = ?`
+        connection.query(query,[USER_ID,SPONSOR_ID],(queryError, result)=> {
+            if(queryError){
+                console.error(`Error fetching application changes:`, queryError);
+                res.status(500).json({ error: 'Internal server error' });
+                return;
+            }
+            else{
+                res.status(200).json(result);
+                return;
+            }
+        });
+    }
+    else if(SPONSOR_ID)
+    {
+        const query = `SELECT * 
+        FROM AuditEntry A JOIN APPAUDIT P ON P.AUDIT_ID = A.AUDIT_ID 
+        WHERE AUDIT_TYPE LIKE 'DRIVER_APPLICATION'
+            AND AUDIT_SPONSOR = ?`
+        connection.query(query,[SPONSOR_ID],(queryError, result)=> {
+            if(queryError){
+                console.error(`Error fetching application changes:`, queryError);
+                res.status(500).json({ error: 'Internal server error' });
+                return;
+            }
+            else{
+                res.status(200).json(result);
+                return;
+            }
+        });
+    }
+    else if(USER_ID)
+    {
+        const query = `SELECT * 
+        FROM AuditEntry A JOIN APPAUDIT P ON P.AUDIT_ID = A.AUDIT_ID 
+        WHERE AUDIT_TYPE LIKE 'DRIVER APPLICATION'
+            AND P.AUDIT_DRIVER = ?`
+        connection.query(query,[USER_ID],(queryError, result)=> {
+            if(queryError){
+                console.error(`Error fetching application changes:`, queryError);
+                res.status(500).json({ error: 'Internal server error' });
+                return;
+            }
+            else{
+                res.status(200).json(result);
+                return;
+            }
+        });
+    }
+
+});
+
+app.get('/login_attempt',(req, res) => {
+    const query = `SELECT * FROM AuditEntry A JOIN LOGINAUDIT L ON L.AUDIT_ID = A.AUDIT_ID WHERE AUDIT_TYPE LIKE 'LOG IN ATTEMPT'`
+    connection.query(query,(queryError, result)=> {
+        if(queryError){
+            console.error(`Error fetching login attempt:`, queryError);
+            res.status(500).json({ error: 'Internal server error' });
+            return;
+        }
+        else{
+            res.status(200).json(result);
+            return;
+        }
+    });
+});
+
+app.get('/password_change',(req, res) => {
+    const query = `SELECT * FROM AuditEntry A JOIN PASSAUDIT P ON P.AUDIT_ID = A.AUDIT_ID WHERE AUDIT_TYPE LIKE 'PASSWORD CHANGE'`
+    connection.query(query,(queryError, result)=> {
+        if(queryError){
+            console.error(`Error fetching password change:`, queryError);
+            res.status(500).json({ error: 'Internal server error' });
+            return;
+        }
+        else{
+            res.status(200).json(result);
+            return;
+        }
+    });
+});
+
 // Takes in a new user for the database  
 app.post('/users', (req, res) => {
     const {USER_TYPE, EMAIL, USERNAME, FNAME, LNAME} = req.body;
