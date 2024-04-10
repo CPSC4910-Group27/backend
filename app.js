@@ -512,23 +512,23 @@ app.get('/catalog',(req,res)=>{
     }
 });
 
-app.delete('/catalog/:itemId', (req, res) => {
-    const itemId = req.params.itemId;
+app.delete('/catalog', (req, res) => {
+    const ITEM_ID = req.query.ITEM_ID;
   
     // Perform the delete operation in the database
-    const sql = `DELETE * FROM CATALOG WHERE ITEM_ID = ${itemId}`;
+    const sql = `DELETE * FROM CATALOG WHERE ITEM_ID = ${ITEM_ID}`;
     connection.query(sql, (queryError, result) => {
       if (queryError) {
-        console.error(`Error deleting item with ID ${itemId}:`, queryError);
+        console.error(`Error deleting item with ID ${ITEM_ID}:`, queryError);
         res.status(500).json({ error: 'Internal server error' });
         return;
       } else {
         // Check if any rows were affected (i.e., if item was deleted)
         if (result.affectedRows === 0) {
-          res.status(404).json({ error: `Item with ID ${itemId} not found` });
+          res.status(404).json({ error: `Item with ID ${ITEM_ID} not found` });
           return;
         }
-        res.status(200).json({ message: `Item with ID ${itemId} deleted successfully` });
+        res.status(200).json({ message: `Item with ID ${ITEM_ID} deleted successfully` });
       }
     });
 });
