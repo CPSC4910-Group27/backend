@@ -516,7 +516,7 @@ app.delete('/catalog', (req, res) => {
     const ITEM_ID = req.query.ITEM_ID;
   
     // Perform the delete operation in the database
-    const sql = `DELETE * FROM CATALOG WHERE ITEM_ID = ${ITEM_ID}`;
+    const sql = `DELETE FROM CATALOG WHERE ITEM_ID = ${ITEM_ID}`;
     connection.query(sql, (queryError, result) => {
       if (queryError) {
         console.error(`Error deleting item with ID ${ITEM_ID}:`, queryError);
