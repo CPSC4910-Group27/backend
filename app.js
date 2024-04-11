@@ -1051,7 +1051,7 @@ app.post('/order',(req,res)=>{
         else{
         const orderId = results.insertId;
         // Insert order items into ORDERITEM table
-        const orderItemSql = `INSERT INTO ORDERITEM(ORDER_ID, ITEM_ID) VALUES(?,?)`;
+        const orderItemSql = `INSERT INTO ORDERITEM(ORDER_ID, ITEM_ID) VALUES (?,?)`;
         ORDER_ITEMS.forEach(item => {
             connection.query(orderItemSql, [orderId, item.ITEM_ID], (error, results) => {
                 if (error) {
