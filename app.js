@@ -1034,6 +1034,37 @@ app.post('/password_change',(req, res)=>{
 
 });
 
+app.post('/order',(req,res)=>{
+    const {USER_ID, SPONSOR_ID, POINT_TOTAL, DOLLAR_AMOUNT, ORDER_ITEMS} = req.body;
+    if(!USER_ID || !SPONSOR_ID || !POINT_TOTAL || !DOLLAR_AMOUNT || !ORDER_ITEMS){
+        return res.status(400).json({ error: 'MISSING FIELDS' });
+    }
+
+    ordersql = `INSERT INTO ORDERS(USER_ID, SPONSOR_ID, POINT_TOTAL, DOLLAR_AMOUNT) VALUES(
+        ?,?,?,?
+    )`;
+    connection.query(ordersql,[USER_ID, SPONSOR_ID, POINT_TOTAL, DOLLAR_AMOUNT], (error, results) => {
+        if (error) {
+            console.error('Error inserting item into ORDERS table :', error);
+            return res.status(500).json({ error: 'Internal Server Error' });
+        }
+        else{
+        const orderId = results.insertId;
+        // Insert order items into ORDERITEM table
+        const orderItemSql = `INSERT INTO ORDERITEM(ORDER_ID, ITEM_ID) VALUES(?,?)`;
+        ORDER_ITEMS.forEach(item => {
+            connection.query(orderItemSql, [orderId, item.ITEM_ID], (error, results) => {
+                if (error) {
+                    console.error('Error inserting item into ORDERITEM table:', error);
+                    return res.status(500).json({ error: 'Internal Server Error' });
+                }
+            });
+        });
+        return res.status(200).json({ orderId: orderId });
+        }
+    });
+})
+
 // Takes in a new log in attempt for the audit table
 app.post('/login_attempt',(req, res)=>{
     const {USERNAME, SUCCESS} = req.body;
