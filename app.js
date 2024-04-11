@@ -615,7 +615,7 @@ app.get('/application_change',(req, res) => {
     const SPONSOR_ID = req.query.SPONSOR_ID;
     if(!USER_ID && !SPONSOR_ID)
     {
-        const query = `SELECT * FROM AuditEntry A JOIN APPAUDIT P ON P.AUDIT_ID = A.AUDIT_ID WHERE AUDIT_TYPE LIKE 'DRIVER APPPLICATION'`
+        const query = `SELECT * FROM AuditEntry A JOIN APPAUDIT P ON P.AUDIT_ID = A.AUDIT_ID WHERE AUDIT_TYPE LIKE 'DRIVER APPLICATION'`
         connection.query(query,(queryError, result)=> {
             if(queryError){
                 console.error(`Error fetching application changes:`, queryError);
