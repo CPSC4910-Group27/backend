@@ -701,7 +701,7 @@ app.get('/login_attempt',(req, res) => {
 });
 
 app.get('/password_change',(req, res) => {
-    const query = `SELECT * FROM AuditEntry A JOIN PASSAUDIT P ON P.AUDIT_ID = A.AUDIT_ID WHERE AUDIT_TYPE LIKE 'PASSWORD CHANGE'`
+    const query = `SELECT * FROM AuditEntry A JOIN PASSAUDIT P ON P.AUDIT_ID = A.AUDIT_ID WHERE A.AUDIT_TYPE LIKE 'PASSWORD CHANGE'`
     connection.query(query,(queryError, result)=> {
         if(queryError){
             console.error(`Error fetching password change:`, queryError);
