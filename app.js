@@ -705,8 +705,7 @@ app.get('/login_attempt',(req, res) => {
     }
     else
     {
-        const query = `SELECT A.AUDIT_ID, P.AUDIT_USERNAME, P.AUDIT_STATUS, A.AUDIT_DATE 
-        FROM AuditEntry A 
+        const query = `SELECT * FROM AuditEntry A 
         JOIN LOGINAUDIT P ON P.AUDIT_ID = A.AUDIT_ID 
         JOIN Users U ON U.EMAIL = P.AUDIT_USERNAME
         LEFT JOIN DriverSponsorships D ON D.USER_ID = U.USER_ID
@@ -747,7 +746,7 @@ app.get('/password_change',(req, res) => {
     }
     else
     {
-        const query = `SELECT A.AUDIT_ID, P.AUDIT_USER, A.USER_ID, P.AUDIT_CHANGE_TYPE, A.AUDIT_DATE FROM AuditEntry A 
+        const query = `SELECT * FROM AuditEntry A 
 		JOIN PASSAUDIT P ON P.AUDIT_ID = A.AUDIT_ID 
         LEFT JOIN DriverSponsorships D ON D.USER_ID = P.AUDIT_USER
         LEFT JOIN Sponsors S ON S.USER_ID = P.AUDIT_USER
