@@ -746,7 +746,7 @@ app.get('/password_change',(req, res) => {
     }
     else
     {
-        const query = `SELECT A.AUDIT_ID, A.USER_ID, P.AUDIT_USER, P.USER_CHANGE_TYPE, A.AUDIT_DATE FROM AuditEntry A 
+        const query = `SELECT A.AUDIT_ID, A.USER_ID, P.AUDIT_USER, P.AUDIT_CHANGE_TYPE, A.AUDIT_DATE FROM AuditEntry A 
 		JOIN PASSAUDIT P ON P.AUDIT_ID = A.AUDIT_ID 
         LEFT JOIN DriverSponsorships D ON D.USER_ID = P.AUDIT_USER
         LEFT JOIN Sponsors S ON S.USER_ID = P.AUDIT_USER
