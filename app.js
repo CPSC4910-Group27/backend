@@ -1085,6 +1085,70 @@ app.post('/password_change',(req, res)=>{
 
 });
 
+app.post('/order', async (req, res) => {
+    const { USER_ID, SPONSOR_ID, POINT_TOTAL, DOLLAR_AMOUNT, ORDER_ITEMS } = req.body;
+    if (!USER_ID || !SPONSOR_ID || !POINT_TOTAL || !DOLLAR_AMOUNT || !ORDER_ITEMS) {
+      return res.status(400).json({ error: 'MISSING FIELDS' });
+    }
+  
+    try {
+      await new Promise((resolve, reject) => {
+        connection.beginTransaction(error => {
+          if (error) {
+            reject(error);
+          } else {
+            resolve();
+          }
+        });
+      });
+  
+      const ordersql = `INSERT INTO ORDERS(USER_ID, SPONSOR_ID, POINT_TOTAL, DOLLAR_AMOUNT) VALUES (?, ?, ?, ?)`;
+      const orderInsertResult = await new Promise((resolve, reject) => {
+        connection.query(ordersql, [USER_ID, SPONSOR_ID, POINT_TOTAL, DOLLAR_AMOUNT], (error, results) => {
+          if (error) {
+            reject(error);
+          } else {
+            resolve(results);
+          }
+        });
+      });
+      const orderId = orderInsertResult.insertId;
+  
+      // Insert order items into ORDERITEM table
+      const orderItemSql = `INSERT INTO ORDERITEM(ORDER_ID, ITEM_ID) VALUES (?, ?)`;
+      for (const itemId of ORDER_ITEMS) {
+        await new Promise((resolve, reject) => {
+          connection.query(orderItemSql, [orderId, itemId], (error, results) => {
+            if (error) {
+              reject(error);
+            } else {
+              resolve();
+            }
+          });
+        });
+      }
+  
+      await new Promise((resolve, reject) => {
+        connection.commit(error => {
+          if (error) {
+            connection.rollback(() => {
+              reject(error);
+            });
+          } else {
+            resolve();
+          }
+        });
+      });
+  
+      return res.status(200).json({ orderId });
+    } catch (error) {
+      console.error('Error processing order:', error);
+      return res.status(500).json({ error: 'Internal Server Error' });
+    }
+  });
+  
+
+
 // Takes in a new log in attempt for the audit table
 app.post('/login_attempt',(req, res)=>{
     const {USERNAME, SUCCESS} = req.body;
