@@ -609,7 +609,7 @@ app.get('/point_change',(req, res) => {
 
 });
 
-// RETURNS POINT CHANGES
+// RETURNS APPLICATION CHANGES
 app.get('/application_change',(req, res) => {
     const USER_ID = req.query.USER_ID;
     const SPONSOR_ID = req.query.SPONSOR_ID;
@@ -703,7 +703,7 @@ app.get('/login_attempt',(req, res) => {
             }
         });
     }
-    else if(SPONSOR_ID)
+    else
     {
         const query = `SELECT A.AUDIT_ID, P.AUDIT_USERNAME, P.AUDIT_STATUS, A.AUDIT_DATE 
         FROM AuditEntry A 
@@ -745,7 +745,7 @@ app.get('/password_change',(req, res) => {
         });
         
     }
-    else if(SPONSOR_ID)
+    else
     {
         const query = `SELECT A.AUDIT_ID, P.AUDIT_USER, A.USER_ID, P.AUDIT_CHANGE_TYPE, A.AUDIT_DATE FROM AuditEntry A 
 		JOIN PASSAUDIT P ON P.AUDIT_ID = A.AUDIT_ID 
