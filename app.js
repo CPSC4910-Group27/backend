@@ -1101,7 +1101,7 @@ app.post('/order', async (req, res) => {
         });
       });
   
-      const ordersql = `INSERT INTO ORDERS(USER_ID, SPONSOR_ID, POINT_TOTAL, DOLLAR_AMOUNT) VALUES (?, ?, ?, ?)`;
+      const ordersql = `INSERT INTO ORDERS(USER_ID, SPONSOR_ID, POINT_TOTAL, DOLLAR_AMOUNT, ORDER_DATE) VALUES (?, ?, ?, ?, CURDATE())`;
       const orderInsertResult = await new Promise((resolve, reject) => {
         connection.query(ordersql, [USER_ID, SPONSOR_ID, POINT_TOTAL, DOLLAR_AMOUNT], (error, results) => {
           if (error) {
