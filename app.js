@@ -539,8 +539,8 @@ app.get('/point_change',(req, res) => {
     const SPONSOR_ID = req.query.SPONSOR_ID;
     if(!USER_ID && !SPONSOR_ID)
     {
-        const query = `SELECT A.*, P.*, U1.FNAME AS USER_FNAME, U1.LNAME AS USER_LNAME, 
-                        U2.FNAME AS AUDIT_DRIVER_FNAME, U2.LNAME AS AUDIT_DRIVER_LNAME
+        const query = `SELECT A.*, P.*, CONCAT(U1.FNAME, ' ', U1.LNAME) AS USER_FULL_NAME, 
+                        CONCAT(U2.FNAME, ' ', U2.LNAME) AS AUDIT_DRIVER_FULL_NAME
                         FROM AuditEntry A
                         JOIN Users U1 ON U1.USER_ID = A.USER_ID
                         JOIN POINTAUDIT P ON P.AUDIT_ID = A.AUDIT_ID
@@ -560,8 +560,8 @@ app.get('/point_change',(req, res) => {
     }
     else if(SPONSOR_ID && USER_ID)
     {
-        const query = `SELECT A.*, P.*, U1.FNAME AS USER_FNAME, U1.LNAME AS USER_LNAME, 
-                        U2.FNAME AS AUDIT_DRIVER_FNAME, U2.LNAME AS AUDIT_DRIVER_LNAME
+        const query = `SELECT A.*, P.*, CONCAT(U1.FNAME, ' ', U1.LNAME) AS USER_FULL_NAME, 
+                        CONCAT(U2.FNAME, ' ', U2.LNAME) AS AUDIT_DRIVER_FULL_NAME
                         FROM AuditEntry A
                         JOIN Users U1 ON U1.USER_ID = A.USER_ID
                         JOIN POINTAUDIT P ON P.AUDIT_ID = A.AUDIT_ID
@@ -582,8 +582,8 @@ app.get('/point_change',(req, res) => {
     }
     else if(SPONSOR_ID)
     {
-        const query = `SELECT A.*, P.*, U1.FNAME AS USER_FNAME, U1.LNAME AS USER_LNAME, 
-                        U2.FNAME AS AUDIT_DRIVER_FNAME, U2.LNAME AS AUDIT_DRIVER_LNAME
+        const query = `SELECT A.*, P.*, CONCAT(U1.FNAME, ' ', U1.LNAME) AS USER_FULL_NAME, 
+                        CONCAT(U2.FNAME, ' ', U2.LNAME) AS AUDIT_DRIVER_FULL_NAME
                         FROM AuditEntry A
                         JOIN Users U1 ON U1.USER_ID = A.USER_ID
                         JOIN POINTAUDIT P ON P.AUDIT_ID = A.AUDIT_ID
@@ -604,8 +604,8 @@ app.get('/point_change',(req, res) => {
     }
     else if(USER_ID)
     {
-        const query = `SELECT A.*, P.*, U1.FNAME AS USER_FNAME, U1.LNAME AS USER_LNAME, 
-                        U2.FNAME AS AUDIT_DRIVER_FNAME, U2.LNAME AS AUDIT_DRIVER_LNAME
+        const query = `SELECT A.*, P.*, CONCAT(U1.FNAME, ' ', U1.LNAME) AS USER_FULL_NAME, 
+                        CONCAT(U2.FNAME, ' ', U2.LNAME) AS AUDIT_DRIVER_FULL_NAME
                         FROM AuditEntry A
                         JOIN Users U1 ON U1.USER_ID = A.USER_ID
                         JOIN POINTAUDIT P ON P.AUDIT_ID = A.AUDIT_ID
@@ -633,8 +633,8 @@ app.get('/application_change',(req, res) => {
     const SPONSOR_ID = req.query.SPONSOR_ID;
     if(!USER_ID && !SPONSOR_ID)
     {
-        const query = `SELECT A.*, P.*, U1.FNAME AS USER_FNAME, U1.LNAME AS USER_LNAME, 
-                        U2.FNAME AS AUDIT_DRIVER_FNAME, U2.LNAME AS AUDIT_DRIVER_LNAME
+        const query = `SELECT A.*, P.*, CONCAT(U1.FNAME, ' ', U1.LNAME) AS USER_FULL_NAME, 
+                        CONCAT(U2.FNAME, ' ', U2.LNAME) AS AUDIT_DRIVER_FULL_NAME
                         FROM AuditEntry A 
                         JOIN Users U1 ON U1.USER_ID = A.USER_ID
                         JOIN APPAUDIT P ON P.AUDIT_ID = A.AUDIT_ID
@@ -654,8 +654,8 @@ app.get('/application_change',(req, res) => {
     }
     else if(SPONSOR_ID && USER_ID)
     {
-        const query = `SELECT A.*, P.*, U1.FNAME AS USER_FNAME, U1.LNAME AS USER_LNAME, 
-                        U2.FNAME AS AUDIT_DRIVER_FNAME, U2.LNAME AS AUDIT_DRIVER_LNAME
+        const query = `SELECT A.*, P.*, CONCAT(U1.FNAME, ' ', U1.LNAME) AS USER_FULL_NAME, 
+                        CONCAT(U2.FNAME, ' ', U2.LNAME) AS AUDIT_DRIVER_FULL_NAME
                         FROM AuditEntry A 
                         JOIN Users U1 ON U1.USER_ID = A.USER_ID
                         JOIN APPAUDIT P ON P.AUDIT_ID = A.AUDIT_ID
@@ -676,8 +676,8 @@ app.get('/application_change',(req, res) => {
     }
     else if(SPONSOR_ID)
     {
-        const query = `SELECT A.*, P.*, U1.FNAME AS USER_FNAME, U1.LNAME AS USER_LNAME, 
-                        U2.FNAME AS AUDIT_DRIVER_FNAME, U2.LNAME AS AUDIT_DRIVER_LNAME
+        const query = `SELECT A.*, P.*, CONCAT(U1.FNAME, ' ', U1.LNAME) AS USER_FULL_NAME, 
+                        CONCAT(U2.FNAME, ' ', U2.LNAME) AS AUDIT_DRIVER_FULL_NAME
                         FROM AuditEntry A 
                         JOIN Users U1 ON U1.USER_ID = A.USER_ID
                         JOIN APPAUDIT P ON P.AUDIT_ID = A.AUDIT_ID
@@ -698,8 +698,8 @@ app.get('/application_change',(req, res) => {
     }
     else if(USER_ID)
     {
-        const query = `SELECT A.*, P.*, U1.FNAME AS USER_FNAME, U1.LNAME AS USER_LNAME, 
-                        U2.FNAME AS AUDIT_DRIVER_FNAME, U2.LNAME AS AUDIT_DRIVER_LNAME
+        const query = `SELECT A.*, P.*, CONCAT(U1.FNAME, ' ', U1.LNAME) AS USER_FULL_NAME, 
+                        CONCAT(U2.FNAME, ' ', U2.LNAME) AS AUDIT_DRIVER_FULL_NAME
                         FROM AuditEntry A 
                         JOIN Users U1 ON U1.USER_ID = A.USER_ID
                         JOIN APPAUDIT P ON P.AUDIT_ID = A.AUDIT_ID
@@ -765,8 +765,9 @@ app.get('/password_change',(req, res) => {
     const SPONSOR_ID = req.query.SPONSOR_ID;
     if(!SPONSOR_ID)
     {
-        const query = `SELECT A.AUDIT_ID, A.USER_ID, U1.FNAME AS USER_FNAME, U1.LNAME AS USER_LNAME, P.AUDIT_USER, 
-                        U2.FNAME AS AUDIT_USER_FNAME, U2.LNAME AS AUDIT_USER_LNAME, P.AUDIT_CHANGE_TYPE, A.AUDIT_DATE 
+        const query = `SELECT A.AUDIT_ID, A.USER_ID, P.AUDIT_USER, 
+                        CONCAT(U1.FNAME, ' ', U1.LNAME) AS USER_FULL_NAME, 
+                        CONCAT(U2.FNAME, ' ', U2.LNAME) AS AUDIT_USER_FULL_NAME, P.AUDIT_CHANGE_TYPE, A.AUDIT_DATE 
                         FROM AuditEntry A 
                         JOIN PASSAUDIT P ON P.AUDIT_ID = A.AUDIT_ID 
                         LEFT JOIN Users U1 ON U1.USER_ID = A.USER_ID
@@ -787,8 +788,8 @@ app.get('/password_change',(req, res) => {
     }
     else
     {
-        const query = `SELECT A.AUDIT_ID, A.USER_ID, U1.FNAME AS USER_FNAME, U1.LNAME AS USER_LNAME, P.AUDIT_USER, 
-                        U2.FNAME AS AUDIT_USER_FNAME, U2.LNAME AS AUDIT_USER_LNAME, P.AUDIT_CHANGE_TYPE, A.AUDIT_DATE 
+        const query = `SELECT A.AUDIT_ID, A.USER_ID, P.AUDIT_USER, CONCAT(U1.FNAME, ' ', U1.LNAME) AS USER_FULL_NAME, 
+                        CONCAT(U2.FNAME, ' ', U2.LNAME) AS AUDIT_USER_FULL_NAME, P.AUDIT_CHANGE_TYPE, A.AUDIT_DATE 
                         FROM AuditEntry A 
                         JOIN PASSAUDIT P ON P.AUDIT_ID = A.AUDIT_ID 
                         LEFT JOIN DriverSponsorships D ON D.USER_ID = P.AUDIT_USER
