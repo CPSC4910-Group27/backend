@@ -539,7 +539,13 @@ app.get('/point_change',(req, res) => {
     const SPONSOR_ID = req.query.SPONSOR_ID;
     if(!USER_ID && !SPONSOR_ID)
     {
-        const query = `SELECT * FROM AuditEntry A JOIN POINTAUDIT P ON P.AUDIT_ID = A.AUDIT_ID WHERE AUDIT_TYPE LIKE 'POINT CHANGE'`
+        const query = `SELECT A.*, P.*, U1.FNAME AS USER_FNAME, U1.LNAME AS USER_LNAME, 
+                        U2.FNAME AS AUDIT_DRIVER_FNAME, U2.LNAME AS AUDIT_DRIVER_LNAME
+                        FROM AuditEntry A
+                        JOIN Users U1 ON U1.USER_ID = A.USER_ID
+                        JOIN POINTAUDIT P ON P.AUDIT_ID = A.AUDIT_ID
+                        JOIN Users U2 ON U2.USER_ID = P.AUDIT_DRIVER 
+                        WHERE AUDIT_TYPE LIKE 'POINT CHANGE'`
         connection.query(query,(queryError, result)=> {
             if(queryError){
                 console.error(`Error fetching point changes:`, queryError);
@@ -554,10 +560,14 @@ app.get('/point_change',(req, res) => {
     }
     else if(SPONSOR_ID && USER_ID)
     {
-        const query = `SELECT * 
-        FROM AuditEntry A JOIN POINTAUDIT P ON P.AUDIT_ID = A.AUDIT_ID 
-        WHERE AUDIT_TYPE LIKE 'POINT CHANGE'
-            AND P.AUDIT_DRIVER = ? AND AUDIT_SPONSOR = ?`
+        const query = `SELECT A.*, P.*, U1.FNAME AS USER_FNAME, U1.LNAME AS USER_LNAME, 
+                        U2.FNAME AS AUDIT_DRIVER_FNAME, U2.LNAME AS AUDIT_DRIVER_LNAME
+                        FROM AuditEntry A
+                        JOIN Users U1 ON U1.USER_ID = A.USER_ID
+                        JOIN POINTAUDIT P ON P.AUDIT_ID = A.AUDIT_ID
+                        JOIN Users U2 ON U2.USER_ID = P.AUDIT_DRIVER 
+                        WHERE AUDIT_TYPE LIKE 'POINT CHANGE'
+                        AND P.AUDIT_DRIVER = ? AND AUDIT_SPONSOR = ?`
         connection.query(query,[USER_ID,SPONSOR_ID],(queryError, result)=> {
             if(queryError){
                 console.error(`Error fetching point changes:`, queryError);
@@ -572,10 +582,14 @@ app.get('/point_change',(req, res) => {
     }
     else if(SPONSOR_ID)
     {
-        const query = `SELECT * 
-        FROM AuditEntry A JOIN POINTAUDIT P ON P.AUDIT_ID = A.AUDIT_ID 
-        WHERE AUDIT_TYPE LIKE 'POINT CHANGE'
-            AND AUDIT_SPONSOR = ?`
+        const query = `SELECT A.*, P.*, U1.FNAME AS USER_FNAME, U1.LNAME AS USER_LNAME, 
+                        U2.FNAME AS AUDIT_DRIVER_FNAME, U2.LNAME AS AUDIT_DRIVER_LNAME
+                        FROM AuditEntry A
+                        JOIN Users U1 ON U1.USER_ID = A.USER_ID
+                        JOIN POINTAUDIT P ON P.AUDIT_ID = A.AUDIT_ID
+                        JOIN Users U2 ON U2.USER_ID = P.AUDIT_DRIVER 
+                        WHERE AUDIT_TYPE LIKE 'POINT CHANGE'
+                        AND P.AUDIT_SPONSOR = ?`
         connection.query(query,[SPONSOR_ID],(queryError, result)=> {
             if(queryError){
                 console.error(`Error fetching point changes:`, queryError);
@@ -590,10 +604,14 @@ app.get('/point_change',(req, res) => {
     }
     else if(USER_ID)
     {
-        const query = `SELECT * 
-        FROM AuditEntry A JOIN POINTAUDIT P ON P.AUDIT_ID = A.AUDIT_ID 
-        WHERE AUDIT_TYPE LIKE 'POINT CHANGE'
-            AND P.AUDIT_DRIVER = ?`
+        const query = `SELECT A.*, P.*, U1.FNAME AS USER_FNAME, U1.LNAME AS USER_LNAME, 
+                        U2.FNAME AS AUDIT_DRIVER_FNAME, U2.LNAME AS AUDIT_DRIVER_LNAME
+                        FROM AuditEntry A
+                        JOIN Users U1 ON U1.USER_ID = A.USER_ID
+                        JOIN POINTAUDIT P ON P.AUDIT_ID = A.AUDIT_ID
+                        JOIN Users U2 ON U2.USER_ID = P.AUDIT_DRIVER 
+                        WHERE AUDIT_TYPE LIKE 'POINT CHANGE'
+                        AND P.AUDIT_DRIVER = ?`
         connection.query(query,[USER_ID],(queryError, result)=> {
             if(queryError){
                 console.error(`Error fetching point changes:`, queryError);
@@ -615,7 +633,13 @@ app.get('/application_change',(req, res) => {
     const SPONSOR_ID = req.query.SPONSOR_ID;
     if(!USER_ID && !SPONSOR_ID)
     {
-        const query = `SELECT * FROM AuditEntry A JOIN APPAUDIT P ON P.AUDIT_ID = A.AUDIT_ID WHERE AUDIT_TYPE LIKE 'DRIVER APPLICATION'`
+        const query = `SELECT A.*, P.*, U1.FNAME AS USER_FNAME, U1.LNAME AS USER_LNAME, 
+                        U2.FNAME AS AUDIT_DRIVER_FNAME, U2.LNAME AS AUDIT_DRIVER_LNAME
+                        FROM AuditEntry A 
+                        JOIN Users U1 ON U1.USER_ID = A.USER_ID
+                        JOIN APPAUDIT P ON P.AUDIT_ID = A.AUDIT_ID
+                        JOIN Users U2 ON U2.USER_ID = P.AUDIT_DRIVER 
+                        WHERE AUDIT_TYPE LIKE 'DRIVER APPLICATION'`
         connection.query(query,(queryError, result)=> {
             if(queryError){
                 console.error(`Error fetching application changes:`, queryError);
@@ -630,10 +654,14 @@ app.get('/application_change',(req, res) => {
     }
     else if(SPONSOR_ID && USER_ID)
     {
-        const query = `SELECT * 
-        FROM AuditEntry A JOIN APPAUDIT P ON P.AUDIT_ID = A.AUDIT_ID 
-        WHERE AUDIT_TYPE LIKE 'DRIVER APPLICATION'
-            AND P.AUDIT_DRIVER = ? AND AUDIT_SPONSOR = ?`
+        const query = `SELECT A.*, P.*, U1.FNAME AS USER_FNAME, U1.LNAME AS USER_LNAME, 
+                        U2.FNAME AS AUDIT_DRIVER_FNAME, U2.LNAME AS AUDIT_DRIVER_LNAME
+                        FROM AuditEntry A 
+                        JOIN Users U1 ON U1.USER_ID = A.USER_ID
+                        JOIN APPAUDIT P ON P.AUDIT_ID = A.AUDIT_ID
+                        JOIN Users U2 ON U2.USER_ID = P.AUDIT_DRIVER 
+                        WHERE AUDIT_TYPE LIKE 'DRIVER APPLICATION'
+                        AND P.AUDIT_DRIVER = ? AND P.AUDIT_SPONSOR = ?;`
         connection.query(query,[USER_ID,SPONSOR_ID],(queryError, result)=> {
             if(queryError){
                 console.error(`Error fetching application changes:`, queryError);
@@ -648,10 +676,14 @@ app.get('/application_change',(req, res) => {
     }
     else if(SPONSOR_ID)
     {
-        const query = `SELECT * 
-        FROM AuditEntry A JOIN APPAUDIT P ON P.AUDIT_ID = A.AUDIT_ID 
-        WHERE AUDIT_TYPE LIKE 'DRIVER_APPLICATION'
-            AND AUDIT_SPONSOR = ?`
+        const query = `SELECT A.*, P.*, U1.FNAME AS USER_FNAME, U1.LNAME AS USER_LNAME, 
+                        U2.FNAME AS AUDIT_DRIVER_FNAME, U2.LNAME AS AUDIT_DRIVER_LNAME
+                        FROM AuditEntry A 
+                        JOIN Users U1 ON U1.USER_ID = A.USER_ID
+                        JOIN APPAUDIT P ON P.AUDIT_ID = A.AUDIT_ID
+                        JOIN Users U2 ON U2.USER_ID = P.AUDIT_DRIVER 
+                        WHERE AUDIT_TYPE LIKE 'DRIVER APPLICATION'
+                        AND P.AUDIT_SPONSOR = ?;`
         connection.query(query,[SPONSOR_ID],(queryError, result)=> {
             if(queryError){
                 console.error(`Error fetching application changes:`, queryError);
@@ -666,10 +698,14 @@ app.get('/application_change',(req, res) => {
     }
     else if(USER_ID)
     {
-        const query = `SELECT * 
-        FROM AuditEntry A JOIN APPAUDIT P ON P.AUDIT_ID = A.AUDIT_ID 
-        WHERE AUDIT_TYPE LIKE 'DRIVER APPLICATION'
-            AND P.AUDIT_DRIVER = ?`
+        const query = `SELECT A.*, P.*, U1.FNAME AS USER_FNAME, U1.LNAME AS USER_LNAME, 
+                        U2.FNAME AS AUDIT_DRIVER_FNAME, U2.LNAME AS AUDIT_DRIVER_LNAME
+                        FROM AuditEntry A 
+                        JOIN Users U1 ON U1.USER_ID = A.USER_ID
+                        JOIN APPAUDIT P ON P.AUDIT_ID = A.AUDIT_ID
+                        JOIN Users U2 ON U2.USER_ID = P.AUDIT_DRIVER 
+                        WHERE AUDIT_TYPE LIKE 'DRIVER APPLICATION'
+                        AND P.AUDIT_DRIVER = ?;`
         connection.query(query,[USER_ID],(queryError, result)=> {
             if(queryError){
                 console.error(`Error fetching application changes:`, queryError);
@@ -706,11 +742,11 @@ app.get('/login_attempt',(req, res) => {
     else
     {
         const query = `SELECT * FROM AuditEntry A 
-        JOIN LOGINAUDIT P ON P.AUDIT_ID = A.AUDIT_ID 
-        JOIN Users U ON U.EMAIL = P.AUDIT_USERNAME
-        LEFT JOIN DriverSponsorships D ON D.USER_ID = U.USER_ID
-        LEFT JOIN Sponsors S ON S.USER_ID = U.USER_ID
-        WHERE (AUDIT_TYPE LIKE 'LOG IN ATTEMPT' AND (D.SPONSOR_ID = ? OR S.SPONSOR_ID = ?));`
+                        JOIN LOGINAUDIT P ON P.AUDIT_ID = A.AUDIT_ID 
+                        JOIN Users U ON U.EMAIL = P.AUDIT_USERNAME
+                        LEFT JOIN DriverSponsorships D ON D.USER_ID = U.USER_ID
+                        LEFT JOIN Sponsors S ON S.USER_ID = U.USER_ID
+                        WHERE (AUDIT_TYPE LIKE 'LOG IN ATTEMPT' AND (D.SPONSOR_ID = ? OR S.SPONSOR_ID = ?));`
         connection.query(query,[SPONSOR_ID, SPONSOR_ID],(queryError, result)=> {
             if(queryError){
                 console.error(`Error fetching login attempt:`, queryError);
@@ -729,8 +765,13 @@ app.get('/password_change',(req, res) => {
     const SPONSOR_ID = req.query.SPONSOR_ID;
     if(!SPONSOR_ID)
     {
-        const query = `SELECT * FROM AuditEntry A JOIN PASSAUDIT P ON P.AUDIT_ID = A.AUDIT_ID 
-        WHERE AUDIT_TYPE LIKE 'PASSWORD CHANGE'`
+        const query = `SELECT A.AUDIT_ID, A.USER_ID, U1.FNAME AS USER_FNAME, U1.LNAME AS USER_LNAME, P.AUDIT_USER, 
+                        U2.FNAME AS AUDIT_USER_FNAME, U2.LNAME AS AUDIT_USER_LNAME, P.AUDIT_CHANGE_TYPE, A.AUDIT_DATE 
+                        FROM AuditEntry A 
+                        JOIN PASSAUDIT P ON P.AUDIT_ID = A.AUDIT_ID 
+                        LEFT JOIN Users U1 ON U1.USER_ID = A.USER_ID
+                        LEFT JOIN Users U2 ON U2.USER_ID = P.AUDIT_USER
+                        WHERE AUDIT_TYPE LIKE 'PASSWORD CHANGE';`
         connection.query(query,(queryError, result)=> {
             if(queryError){
                 console.error(`Error fetching password change:`, queryError);
@@ -746,11 +787,15 @@ app.get('/password_change',(req, res) => {
     }
     else
     {
-        const query = `SELECT A.AUDIT_ID, A.USER_ID, P.AUDIT_USER, P.AUDIT_CHANGE_TYPE, A.AUDIT_DATE FROM AuditEntry A 
-		JOIN PASSAUDIT P ON P.AUDIT_ID = A.AUDIT_ID 
-        LEFT JOIN DriverSponsorships D ON D.USER_ID = P.AUDIT_USER
-        LEFT JOIN Sponsors S ON S.USER_ID = P.AUDIT_USER
-        WHERE (AUDIT_TYPE LIKE 'PASSWORD CHANGE' AND (D.SPONSOR_ID = ? OR S.SPONSOR_ID = ?));`
+        const query = `SELECT A.AUDIT_ID, A.USER_ID, U1.FNAME AS USER_FNAME, U1.LNAME AS USER_LNAME, P.AUDIT_USER, 
+                        U2.FNAME AS AUDIT_USER_FNAME, U2.LNAME AS AUDIT_USER_LNAME, P.AUDIT_CHANGE_TYPE, A.AUDIT_DATE 
+                        FROM AuditEntry A 
+                        JOIN PASSAUDIT P ON P.AUDIT_ID = A.AUDIT_ID 
+                        LEFT JOIN DriverSponsorships D ON D.USER_ID = P.AUDIT_USER
+                        LEFT JOIN Sponsors S ON S.USER_ID = P.AUDIT_USER
+                        LEFT JOIN Users U1 ON U1.USER_ID = A.USER_ID
+                        LEFT JOIN Users U2 ON U2.USER_ID = P.AUDIT_USER
+                        WHERE (A.AUDIT_TYPE LIKE 'PASSWORD CHANGE' AND (D.SPONSOR_ID = ? OR S.SPONSOR_ID = ?));`
         connection.query(query,[SPONSOR_ID, SPONSOR_ID],(queryError, result)=> {
             if(queryError){
                 console.error(`Error fetching password change:`, queryError);
