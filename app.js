@@ -539,11 +539,12 @@ app.get('/point_change',(req, res) => {
     const SPONSOR_ID = req.query.SPONSOR_ID;
     if(!USER_ID && !SPONSOR_ID)
     {
-        const query = `SELECT A.*, P.*, CONCAT(U1.FNAME, ' ', U1.LNAME) AS USER_FULL_NAME, 
+        const query = `SELECT A.*, P.*, S.*, CONCAT(U1.FNAME, ' ', U1.LNAME) AS USER_FULL_NAME, 
                         CONCAT(U2.FNAME, ' ', U2.LNAME) AS AUDIT_DRIVER_FULL_NAME
                         FROM AuditEntry A
                         JOIN Users U1 ON U1.USER_ID = A.USER_ID
                         JOIN POINTAUDIT P ON P.AUDIT_ID = A.AUDIT_ID
+                        JOIN SponsorCompany S ON S.SPONSOR_ID = P.AUDIT_SPONSOR
                         JOIN Users U2 ON U2.USER_ID = P.AUDIT_DRIVER 
                         WHERE AUDIT_TYPE LIKE 'POINT CHANGE'`
         connection.query(query,(queryError, result)=> {
@@ -560,11 +561,12 @@ app.get('/point_change',(req, res) => {
     }
     else if(SPONSOR_ID && USER_ID)
     {
-        const query = `SELECT A.*, P.*, CONCAT(U1.FNAME, ' ', U1.LNAME) AS USER_FULL_NAME, 
+        const query = `SELECT A.*, P.*, S.*, CONCAT(U1.FNAME, ' ', U1.LNAME) AS USER_FULL_NAME, 
                         CONCAT(U2.FNAME, ' ', U2.LNAME) AS AUDIT_DRIVER_FULL_NAME
                         FROM AuditEntry A
                         JOIN Users U1 ON U1.USER_ID = A.USER_ID
                         JOIN POINTAUDIT P ON P.AUDIT_ID = A.AUDIT_ID
+                        JOIN SponsorCompany S ON S.SPONSOR_ID = P.AUDIT_SPONSOR
                         JOIN Users U2 ON U2.USER_ID = P.AUDIT_DRIVER 
                         WHERE AUDIT_TYPE LIKE 'POINT CHANGE'
                         AND P.AUDIT_DRIVER = ? AND AUDIT_SPONSOR = ?`
@@ -582,11 +584,12 @@ app.get('/point_change',(req, res) => {
     }
     else if(SPONSOR_ID)
     {
-        const query = `SELECT A.*, P.*, CONCAT(U1.FNAME, ' ', U1.LNAME) AS USER_FULL_NAME, 
+        const query = `SELECT A.*, P.*, S.*, CONCAT(U1.FNAME, ' ', U1.LNAME) AS USER_FULL_NAME, 
                         CONCAT(U2.FNAME, ' ', U2.LNAME) AS AUDIT_DRIVER_FULL_NAME
                         FROM AuditEntry A
                         JOIN Users U1 ON U1.USER_ID = A.USER_ID
                         JOIN POINTAUDIT P ON P.AUDIT_ID = A.AUDIT_ID
+                        JOIN SponsorCompany S ON S.SPONSOR_ID = P.AUDIT_SPONSOR
                         JOIN Users U2 ON U2.USER_ID = P.AUDIT_DRIVER 
                         WHERE AUDIT_TYPE LIKE 'POINT CHANGE'
                         AND P.AUDIT_SPONSOR = ?`
@@ -604,11 +607,12 @@ app.get('/point_change',(req, res) => {
     }
     else if(USER_ID)
     {
-        const query = `SELECT A.*, P.*, CONCAT(U1.FNAME, ' ', U1.LNAME) AS USER_FULL_NAME, 
+        const query = `SELECT A.*, P.*, S.*, CONCAT(U1.FNAME, ' ', U1.LNAME) AS USER_FULL_NAME, 
                         CONCAT(U2.FNAME, ' ', U2.LNAME) AS AUDIT_DRIVER_FULL_NAME
                         FROM AuditEntry A
                         JOIN Users U1 ON U1.USER_ID = A.USER_ID
                         JOIN POINTAUDIT P ON P.AUDIT_ID = A.AUDIT_ID
+                        JOIN SponsorCompany S ON S.SPONSOR_ID = P.AUDIT_SPONSOR
                         JOIN Users U2 ON U2.USER_ID = P.AUDIT_DRIVER 
                         WHERE AUDIT_TYPE LIKE 'POINT CHANGE'
                         AND P.AUDIT_DRIVER = ?`
@@ -633,11 +637,12 @@ app.get('/application_change',(req, res) => {
     const SPONSOR_ID = req.query.SPONSOR_ID;
     if(!USER_ID && !SPONSOR_ID)
     {
-        const query = `SELECT A.*, P.*, CONCAT(U1.FNAME, ' ', U1.LNAME) AS USER_FULL_NAME, 
+        const query = `SELECT A.*, P.*, S.*, CONCAT(U1.FNAME, ' ', U1.LNAME) AS USER_FULL_NAME, 
                         CONCAT(U2.FNAME, ' ', U2.LNAME) AS AUDIT_DRIVER_FULL_NAME
                         FROM AuditEntry A 
                         JOIN Users U1 ON U1.USER_ID = A.USER_ID
                         JOIN APPAUDIT P ON P.AUDIT_ID = A.AUDIT_ID
+                        JOIN SponsorCompany S ON S.SPONSOR_ID = P.AUDIT_SPONSOR
                         JOIN Users U2 ON U2.USER_ID = P.AUDIT_DRIVER 
                         WHERE AUDIT_TYPE LIKE 'DRIVER APPLICATION'`
         connection.query(query,(queryError, result)=> {
@@ -654,11 +659,12 @@ app.get('/application_change',(req, res) => {
     }
     else if(SPONSOR_ID && USER_ID)
     {
-        const query = `SELECT A.*, P.*, CONCAT(U1.FNAME, ' ', U1.LNAME) AS USER_FULL_NAME, 
+        const query = `SELECT A.*, P.*, S.*, CONCAT(U1.FNAME, ' ', U1.LNAME) AS USER_FULL_NAME, 
                         CONCAT(U2.FNAME, ' ', U2.LNAME) AS AUDIT_DRIVER_FULL_NAME
                         FROM AuditEntry A 
                         JOIN Users U1 ON U1.USER_ID = A.USER_ID
                         JOIN APPAUDIT P ON P.AUDIT_ID = A.AUDIT_ID
+                        JOIN SponsorCompany S ON S.SPONSOR_ID = P.AUDIT_SPONSOR
                         JOIN Users U2 ON U2.USER_ID = P.AUDIT_DRIVER 
                         WHERE AUDIT_TYPE LIKE 'DRIVER APPLICATION'
                         AND P.AUDIT_DRIVER = ? AND P.AUDIT_SPONSOR = ?;`
@@ -676,11 +682,12 @@ app.get('/application_change',(req, res) => {
     }
     else if(SPONSOR_ID)
     {
-        const query = `SELECT A.*, P.*, CONCAT(U1.FNAME, ' ', U1.LNAME) AS USER_FULL_NAME, 
+        const query = `SELECT A.*, P.*, S.*, CONCAT(U1.FNAME, ' ', U1.LNAME) AS USER_FULL_NAME, 
                         CONCAT(U2.FNAME, ' ', U2.LNAME) AS AUDIT_DRIVER_FULL_NAME
                         FROM AuditEntry A 
                         JOIN Users U1 ON U1.USER_ID = A.USER_ID
                         JOIN APPAUDIT P ON P.AUDIT_ID = A.AUDIT_ID
+                        JOIN SponsorCompany S ON S.SPONSOR_ID = P.AUDIT_SPONSOR
                         JOIN Users U2 ON U2.USER_ID = P.AUDIT_DRIVER 
                         WHERE AUDIT_TYPE LIKE 'DRIVER APPLICATION'
                         AND P.AUDIT_SPONSOR = ?;`
@@ -698,11 +705,12 @@ app.get('/application_change',(req, res) => {
     }
     else if(USER_ID)
     {
-        const query = `SELECT A.*, P.*, CONCAT(U1.FNAME, ' ', U1.LNAME) AS USER_FULL_NAME, 
+        const query = `SELECT A.*, P.*, S.*, CONCAT(U1.FNAME, ' ', U1.LNAME) AS USER_FULL_NAME, 
                         CONCAT(U2.FNAME, ' ', U2.LNAME) AS AUDIT_DRIVER_FULL_NAME
                         FROM AuditEntry A 
                         JOIN Users U1 ON U1.USER_ID = A.USER_ID
                         JOIN APPAUDIT P ON P.AUDIT_ID = A.AUDIT_ID
+                        JOIN SponsorCompany S ON S.SPONSOR_ID = P.AUDIT_SPONSOR
                         JOIN Users U2 ON U2.USER_ID = P.AUDIT_DRIVER 
                         WHERE AUDIT_TYPE LIKE 'DRIVER APPLICATION'
                         AND P.AUDIT_DRIVER = ?;`
