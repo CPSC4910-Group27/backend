@@ -127,7 +127,7 @@ app.get('/users', (req, res) => {
         query = "SELECT * FROM Users WHERE EMAIL LIKE '" + EMAIL.toString() + "'"; 
     }
     else if (USER_ID){
-        query = "SELECT * FROM Users WHERE EMAIL LIKE '" + USER_ID.toString() + "'"; 
+        query = "SELECT * FROM Users WHERE USER_ID = '" + USER_ID.toString() + "'"; 
     }
     else{
             res.status(400).json({ error: 'Missing Query Params' });
