@@ -922,7 +922,7 @@ app.get('/invoices', (req, res) => {
     }
     else if(SPONSOR_ID && USER_ID)
     {
-        const query = `SELECT O.USER_ID, O.SPONSOR_ID, SUM(O.POINT_TOTAL) AS TOTAL_POINTS_REDEEMED, SUM(O.DOLLAR_AMOUNT) AS TOTAL_POINTS, 
+        const query = `SELECT O.USER_ID, O.SPONSOR_ID, SUM(O.POINT_TOTAL) AS TOTAL_POINTS_REDEEMED, SUM(O.DOLLAR_AMOUNT) AS TOTAL_SPENT, 
                         O.ORDER_DATE, CONCAT(U.FNAME, ' ', U.LNAME) AS FULLNAME, S.SPONSOR_NAME 
                         FROM ORDERS O
                         JOIN Users U ON U.USER_ID = O.USER_ID
@@ -943,7 +943,7 @@ app.get('/invoices', (req, res) => {
     }
     else if(SPONSOR_ID)
     {
-        const query = `SELECT O.USER_ID, O.SPONSOR_ID, SUM(O.POINT_TOTAL) AS TOTAL_POINTS_REDEEMED, SUM(O.DOLLAR_AMOUNT) AS TOTAL_POINTS, 
+        const query = `SELECT O.USER_ID, O.SPONSOR_ID, SUM(O.POINT_TOTAL) AS TOTAL_POINTS_REDEEMED, SUM(O.DOLLAR_AMOUNT) AS TOTAL_SPENT, 
                         O.ORDER_DATE, CONCAT(U.FNAME, ' ', U.LNAME) AS FULLNAME, S.SPONSOR_NAME 
                         FROM ORDERS O
                         JOIN Users U ON U.USER_ID = O.USER_ID
@@ -964,7 +964,7 @@ app.get('/invoices', (req, res) => {
     }
     else if(USER_ID)
     {
-        const query = `SELECT O.USER_ID, O.SPONSOR_ID, SUM(O.POINT_TOTAL) AS TOTAL_POINTS_REDEEMED, SUM(O.DOLLAR_AMOUNT) AS TOTAL_POINTS, 
+        const query = `SELECT O.USER_ID, O.SPONSOR_ID, SUM(O.POINT_TOTAL) AS TOTAL_POINTS_REDEEMED, SUM(O.DOLLAR_AMOUNT) AS TOTAL_SPENT, 
                         O.ORDER_DATE, CONCAT(U.FNAME, ' ', U.LNAME) AS FULLNAME, S.SPONSOR_NAME 
                         FROM ORDERS O
                         JOIN Users U ON U.USER_ID = O.USER_ID
