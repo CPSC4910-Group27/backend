@@ -900,85 +900,62 @@ app.get('/orders', (req, res) => {
     }
 });
 
-app.get('/invoices', (req, res) => {
-    const SPONSOR_ID = req.query.SPONSOR_ID;
-    const START_DATE = req.query.START_DATE;
-    const END_DATE = req.query.END_DATE;
-
-    if (!SPONSOR_ID && !START_DATE && !END_DATE) {
-        const query = `SELECT O.*,SUM(O.POINT_TOTAL) AS POINTSREDEEMED, SUM(O.DOLLAR_AMOUNT) AS TOTALSPENT,
-                        CONCAT(U.FNAME, ' ', U.LNAME) AS FULLNAME, S.SPONSOR_NAME
-                        FROM ORDERS O
-                        JOIN Users U ON U.USER_ID = O.USER_ID
-                        JOIN SponsorCompany S ON S.SPONSOR_ID = O.SPONSOR_ID
-                        GROUP BY O.SPONSOR_ID, O.USER_ID;`;
-        connection.query(query, (queryError, result) => {
-            if (queryError) {
-                console.error(`Error fetching invoices:`, queryError);
-                res.status(500).json({ error: 'Internal server error' });
-                return;
-            } else {
-                res.status(200).json(result);
-                return;
-            }
-        });
-    } else if (SPONSOR_ID && START_DATE && END_DATE) {
-        const query = `SELECT O.*,SUM(O.POINT_TOTAL) AS POINTSREDEEMED, SUM(O.DOLLAR_AMOUNT) AS TOTALSPENT,
-                        CONCAT(U.FNAME, ' ', U.LNAME) AS FULLNAME, S.SPONSOR_NAME
-                        FROM ORDERS O
-                        JOIN Users U ON U.USER_ID = O.USER_ID
-                        JOIN SponsorCompany S ON S.SPONSOR_ID = O.SPONSOR_ID
-                        WHERE O.SPONSOR_ID = ? O.ORDER_DATE BETWEEN ? AND ?
-                        GROUP BY O.SPONSOR_ID, O.USER_ID;`;
-        connection.query(query, [SPONSOR_ID, START_DATE, END_DATE], (queryError, result) => {
-            if (queryError) {
-                console.error(`Error fetching invoices:`, queryError);
-                res.status(500).json({ error: 'Internal server error' });
-                return;
-            } else {
-                res.status(200).json(result);
-                return;
-            }
-        });
-    } else if (SPONSOR_ID) {
-        const query = `SELECT O.*,SUM(O.POINT_TOTAL) AS POINTSREDEEMED, SUM(O.DOLLAR_AMOUNT) AS TOTALSPENT,
-                        CONCAT(U.FNAME, ' ', U.LNAME) AS FULLNAME, S.SPONSOR_NAME
-                        FROM ORDERS O
-                        JOIN Users U ON U.USER_ID = O.USER_ID
-                        JOIN SponsorCompany S ON S.SPONSOR_ID = O.SPONSOR_ID
-                        WHERE O.SPONSOR_ID = ?
-                        GROUP BY O.SPONSOR_ID, O.USER_ID;`;
-        connection.query(query, [SPONSOR_ID], (queryError, result) => {
-            if (queryError) {
-                console.error(`Error fetching invoices:`, queryError);
-                res.status(500).json({ error: 'Internal server error' });
-                return;
-            } else {
-                res.status(200).json(result);
-                return;
-            }
-        });
-    } else if (START_DATE && END_DATE) {
-        const query = `SELECT O.*,SUM(O.POINT_TOTAL) AS POINTSREDEEMED, SUM(O.DOLLAR_AMOUNT) AS TOTALSPENT,
-                        CONCAT(U.FNAME, ' ', U.LNAME) AS FULLNAME, S.SPONSOR_NAME
-                        FROM ORDERS O
-                        JOIN Users U ON U.USER_ID = O.USER_ID
-                        JOIN SponsorCompany S ON S.SPONSOR_ID = O.SPONSOR_ID
-                        WHERE O.ORDER_DATE BETWEEN ? AND ?
-                        GROUP BY O.SPONSOR_ID, O.USER_ID;`;
-        connection.query(query, [START_DATE, END_DATE], (queryError, result) => {
-            if (queryError) {
-                console.error(`Error fetching invoices:`, queryError);
-                res.status(500).json({ error: 'Internal server error' });
-                return;
-            } else {
-                res.status(200).json(result);
-                return;
-            }
-        });
-    }
-});
-
+if (SPONSOR_ID && START_DATE && END_DATE) {
+    const query = `SELECT O.*,SUM(O.POINT_TOTAL) AS POINTSREDEEMED, SUM(O.DOLLAR_AMOUNT) AS TOTALSPENT,
+                    CONCAT(U.FNAME, ' ', U.LNAME) AS FULLNAME, S.SPONSOR_NAME
+                    FROM ORDERS O
+                    JOIN Users U ON U.USER_ID = O.USER_ID
+                    JOIN SponsorCompany S ON S.SPONSOR_ID = O.SPONSOR_ID
+                    WHERE O.SPONSOR_ID = ? AND O.ORDER_DATE BETWEEN ? AND ?
+                    GROUP BY O.SPONSOR_ID, O.USER_ID;`;
+    connection.query(query, [SPONSOR_ID, START_DATE, END_DATE], (queryError, result) => {
+        if (queryError) {
+            console.error(`Error fetching invoices:`, queryError);
+            res.status(500).json({ error: 'Internal server error' });
+            return;
+        } else {
+            res.status(200).json(result);
+            return;
+        }
+    });
+} else if (SPONSOR_ID) {
+    // If only SPONSOR_ID is provided without a date range, fetch all invoices for the sponsor
+    const query = `SELECT O.*,SUM(O.POINT_TOTAL) AS POINTSREDEEMED, SUM(O.DOLLAR_AMOUNT) AS TOTALSPENT,
+                    CONCAT(U.FNAME, ' ', U.LNAME) AS FULLNAME, S.SPONSOR_NAME
+                    FROM ORDERS O
+                    JOIN Users U ON U.USER_ID = O.USER_ID
+                    JOIN SponsorCompany S ON S.SPONSOR_ID = O.SPONSOR_ID
+                    WHERE O.SPONSOR_ID = ?
+                    GROUP BY O.SPONSOR_ID, O.USER_ID;`;
+    connection.query(query, [SPONSOR_ID], (queryError, result) => {
+        if (queryError) {
+            console.error(`Error fetching invoices:`, queryError);
+            res.status(500).json({ error: 'Internal server error' });
+            return;
+        } else {
+            res.status(200).json(result);
+            return;
+        }
+    });
+} else {
+    // If neither SPONSOR_ID nor a date range is provided, fetch all invoices
+    const query = `SELECT O.*,SUM(O.POINT_TOTAL) AS POINTSREDEEMED, SUM(O.DOLLAR_AMOUNT) AS TOTALSPENT,
+                    CONCAT(U.FNAME, ' ', U.LNAME) AS FULLNAME, S.SPONSOR_NAME
+                    FROM ORDERS O
+                    JOIN Users U ON U.USER_ID = O.USER_ID
+                    JOIN SponsorCompany S ON S.SPONSOR_ID = O.SPONSOR_ID
+                    GROUP BY O.SPONSOR_ID, O.USER_ID;`;
+    connection.query(query, (queryError, result) => {
+        if (queryError) {
+            console.error(`Error fetching invoices:`, queryError);
+            res.status(500).json({ error: 'Internal server error' });
+            return;
+        } else {
+            res.status(200).json(result);
+            return;
+        }
+    });
+}
 
 // Takes in a new user for the database  
 app.post('/users', (req, res) => {
