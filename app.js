@@ -902,7 +902,7 @@ app.get('/invoices', (req, res) => {
 
     if(!USER_ID && !SPONSOR_ID)
     {
-        const query = `SELECT O.USER_ID, O.SPONSOR_ID, SUM(O.POINT_TOTAL) AS 'TOTAL POINTS REDEEMED', SUM(O.DOLLAR_AMOUNT) AS 'TOTAL SPENT', 
+        const query = `SELECT O.USER_ID, O.SPONSOR_ID, SUM(O.POINT_TOTAL) AS TOTAL_POINTS_REDEEMED, SUM(O.DOLLAR_AMOUNT) AS TOTAL_SPENT, 
                         O.ORDER_DATE, CONCAT(U.FNAME, ' ', U.LNAME) AS FULLNAME, S.SPONSOR_NAME 
                         FROM ORDERS O
                         JOIN Users U ON U.USER_ID = O.USER_ID
