@@ -906,7 +906,8 @@ app.get('/invoices', (req, res) => {
     const END_DATE = req.query.END_DATE;
 
     if (!SPONSOR_ID && !START_DATE && !END_DATE) {
-        const query = `SELECT O.*, SUM(O.POINT_TOTAL) AS POINTSREDEEMED, SUM(O.DOLLAR_AMOUNT) AS TOTALSPENT, CONCAT(U.FNAME, ' ', U.LNAME) AS FULLNAME, S.SPONSOR_NAME
+        const query = `SELECT O.*,SUM(O.POINT_TOTAL) AS POINTSREDEEMED, SUM(O.DOLLAR_AMOUNT) AS TOTALSPENT,
+                        CONCAT(U.FNAME, ' ', U.LNAME) AS FULLNAME, S.SPONSOR_NAME
                         FROM ORDERS O
                         JOIN Users U ON U.USER_ID = O.USER_ID
                         JOIN SponsorCompany S ON S.SPONSOR_ID = O.SPONSOR_ID
@@ -922,11 +923,12 @@ app.get('/invoices', (req, res) => {
             }
         });
     } else if (SPONSOR_ID && START_DATE && END_DATE) {
-        const query = `SELECT O.*, SUM(O.POINT_TOTAL) AS POINTSREDEEMED, SUM(O.DOLLAR_AMOUNT) AS TOTALSPENT, CONCAT(U.FNAME, ' ', U.LNAME) AS FULLNAME, S.SPONSOR_NAME
+        const query = `SELECT O.*,SUM(O.POINT_TOTAL) AS POINTSREDEEMED, SUM(O.DOLLAR_AMOUNT) AS TOTALSPENT,
+                        CONCAT(U.FNAME, ' ', U.LNAME) AS FULLNAME, S.SPONSOR_NAME
                         FROM ORDERS O
                         JOIN Users U ON U.USER_ID = O.USER_ID
                         JOIN SponsorCompany S ON S.SPONSOR_ID = O.SPONSOR_ID
-                        WHERE O.SPONSOR_ID = ? AND O.ORDER_DATE >= ? AND O.ORDER_DATE <= ?
+                        WHERE O.SPONSOR_ID = ? O.ORDER_DATE BETWEEN ? AND ?
                         GROUP BY O.SPONSOR_ID, O.USER_ID;`;
         connection.query(query, [SPONSOR_ID, START_DATE, END_DATE], (queryError, result) => {
             if (queryError) {
@@ -939,12 +941,13 @@ app.get('/invoices', (req, res) => {
             }
         });
     } else if (SPONSOR_ID) {
-        const query = `SELECT O.*, SUM(O.POINT_TOTAL) AS POINTSREDEEMED, SUM(O.DOLLAR_AMOUNT) AS TOTALSPENT, CONCAT(U.FNAME, ' ', U.LNAME) AS FULLNAME, S.SPONSOR_NAME
+        const query = `SELECT O.*,SUM(O.POINT_TOTAL) AS POINTSREDEEMED, SUM(O.DOLLAR_AMOUNT) AS TOTALSPENT,
+                        CONCAT(U.FNAME, ' ', U.LNAME) AS FULLNAME, S.SPONSOR_NAME
                         FROM ORDERS O
                         JOIN Users U ON U.USER_ID = O.USER_ID
                         JOIN SponsorCompany S ON S.SPONSOR_ID = O.SPONSOR_ID
                         WHERE O.SPONSOR_ID = ?
-                        GROUP BY O.SPONSOR_ID, O.USER_ID;`
+                        GROUP BY O.SPONSOR_ID, O.USER_ID;`;
         connection.query(query, [SPONSOR_ID], (queryError, result) => {
             if (queryError) {
                 console.error(`Error fetching invoices:`, queryError);
@@ -956,12 +959,13 @@ app.get('/invoices', (req, res) => {
             }
         });
     } else if (START_DATE && END_DATE) {
-        const query = `SELECT O.*, SUM(O.POINT_TOTAL) AS POINTSREDEEMED, SUM(O.DOLLAR_AMOUNT) AS TOTALSPENT, CONCAT(U.FNAME, ' ', U.LNAME) AS FULLNAME, S.SPONSOR_NAME
+        const query = `SELECT O.*,SUM(O.POINT_TOTAL) AS POINTSREDEEMED, SUM(O.DOLLAR_AMOUNT) AS TOTALSPENT,
+                        CONCAT(U.FNAME, ' ', U.LNAME) AS FULLNAME, S.SPONSOR_NAME
                         FROM ORDERS O
                         JOIN Users U ON U.USER_ID = O.USER_ID
                         JOIN SponsorCompany S ON S.SPONSOR_ID = O.SPONSOR_ID
-                        WHERE O.ORDER_DATE >= ? AND O.ORDER_DATE <= ?
-                        GROUP BY O.SPONSOR_ID, O.USER_ID;`
+                        WHERE O.ORDER_DATE BETWEEN ? AND ?
+                        GROUP BY O.SPONSOR_ID, O.USER_ID;`;
         connection.query(query, [START_DATE, END_DATE], (queryError, result) => {
             if (queryError) {
                 console.error(`Error fetching invoices:`, queryError);
