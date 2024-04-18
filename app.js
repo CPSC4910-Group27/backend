@@ -955,7 +955,7 @@ app.post('/sponsorcompany', (req, res) => {
 });
 // Takes in a new sponsor to Sponsors table
 app.post('/sponsors', (req, res) => {
-    const { SPONSOR_ADMIN_ID, SPONSOR_COMPANY_ID, USER_ID} = req.body;
+    const { SPONSOR_ADMIN_ID, SPONSOR_COMPANY_ID, USER_ID, IS_ADMIN} = req.body;
 
     // Check if required fields are provided
     if (!USER_ID || (!SPONSOR_ADMIN_ID && !SPONSOR_COMPANY_ID)) {
@@ -983,7 +983,7 @@ app.post('/sponsors', (req, res) => {
     else{ // We just take the company id and reassign it
         sponsorId = SPONSOR_COMPANY_ID;
     }
-
+    if(!IS_ADMIN){
     // SQL query to insert data into the Sponsors table
     const insertSponsorQuery = 'INSERT INTO Sponsors (USER_ID, SPONSOR_ID) VALUES (?, ?)';
 
@@ -996,6 +996,21 @@ app.post('/sponsors', (req, res) => {
 
         res.json({ message: 'Sponsor account created successfully', result: insertResults });
     });
+    }
+    else{
+    // SQL query to insert data into the Sponsors table
+    const insertSponsorQuery = 'INSERT INTO Sponsors (USER_ID, SPONSOR_ID, IS_ADMIN) VALUES (?, ?, 1)';
+
+    // Execute the query to insert new sponsor
+    connection.query(insertSponsorQuery, [USER_ID, sponsorId], (error, insertResults) => {
+        if (error) {
+            console.error('Error inserting sponsor:', error);
+            return res.status(500).json({ error: 'Internal Server Error' });
+        }
+
+        res.json({ message: 'Sponsor account created successfully', result: insertResults });
+    });
+    }
 });
 
 // Takes in a new item to the catalog
