@@ -896,6 +896,95 @@ app.get('/orders', (req, res) => {
     }
 });
 
+app.get('/invoices', (req, res) => {
+    const USER_ID = req.query.USER_ID;
+    const SPONSOR_ID = req.query.SPONSOR_ID;
+
+    if(!USER_ID && !SPONSOR_ID)
+    {
+        const query = `SELECT O.USER_ID, O.SPONSOR_ID, SUM(O.POINT_TOTAL) AS 'TOTAL POINTS REDEEMED', SUM(O.DOLLAR_AMOUNT) AS 'TOTAL SPENT', 
+                        O.ORDER_DATE, CONCAT(U.FNAME, ' ', U.LNAME) AS FULLNAME, S.SPONSOR_NAME 
+                        FROM ORDERS O
+                        JOIN Users U ON U.USER_ID = O.USER_ID
+                        JOIN SponsorCompany S ON S.SPONSOR_ID = O.SPONSOR_ID
+                        GROUP BY O.USER_ID, O.SPONSOR_ID;`
+        connection.query(query,(queryError, result)=> {
+            if(queryError){
+                console.error(`Error fetching invoices:`, queryError);
+                res.status(500).json({ error: 'Internal server error' });
+                return;
+            }
+            else{
+                res.status(200).json(result);
+                return;
+            }
+        });
+    }
+    else if(SPONSOR_ID && USER_ID)
+    {
+        const query = `SELECT O.USER_ID, O.SPONSOR_ID, SUM(O.POINT_TOTAL) AS 'TOTAL POINTS REDEEMED', SUM(O.DOLLAR_AMOUNT) AS 'TOTAL SPENT', 
+                        O.ORDER_DATE, CONCAT(U.FNAME, ' ', U.LNAME) AS FULLNAME, S.SPONSOR_NAME 
+                        FROM ORDERS O
+                        JOIN Users U ON U.USER_ID = O.USER_ID
+                        JOIN SponsorCompany S ON S.SPONSOR_ID = O.SPONSOR_ID
+                        WHERE O.USER_OD = ? AND O.SPONSOR_ID = ?
+                        GROUP BY O.USER_ID, O.SPONSOR_ID;`
+        connection.query(query,[USER_ID,SPONSOR_ID],(queryError, result)=> {
+            if(queryError){
+                console.error(`Error fetching invoices:`, queryError);
+                res.status(500).json({ error: 'Internal server error' });
+                return;
+            }
+            else{
+                res.status(200).json(result);
+                return;
+            }
+        });
+    }
+    else if(SPONSOR_ID)
+    {
+        const query = `SELECT O.USER_ID, O.SPONSOR_ID, SUM(O.POINT_TOTAL) AS 'TOTAL POINTS REDEEMED', SUM(O.DOLLAR_AMOUNT) AS 'TOTAL SPENT', 
+                        O.ORDER_DATE, CONCAT(U.FNAME, ' ', U.LNAME) AS FULLNAME, S.SPONSOR_NAME 
+                        FROM ORDERS O
+                        JOIN Users U ON U.USER_ID = O.USER_ID
+                        JOIN SponsorCompany S ON S.SPONSOR_ID = O.SPONSOR_ID
+                        WHERE O.SPONSOR_ID = ?
+                        GROUP BY O.USER_ID, O.SPONSOR_ID;`
+        connection.query(query,[SPONSOR_ID],(queryError, result)=> {
+            if(queryError){
+                console.error(`Error fetching invoices:`, queryError);
+                res.status(500).json({ error: 'Internal server error' });
+                return;
+            }
+            else{
+                res.status(200).json(result);
+                return;
+            }
+        });
+    }
+    else if(USER_ID)
+    {
+        const query = `SELECT O.USER_ID, O.SPONSOR_ID, SUM(O.POINT_TOTAL) AS 'TOTAL POINTS REDEEMED', SUM(O.DOLLAR_AMOUNT) AS 'TOTAL SPENT', 
+                        O.ORDER_DATE, CONCAT(U.FNAME, ' ', U.LNAME) AS FULLNAME, S.SPONSOR_NAME 
+                        FROM ORDERS O
+                        JOIN Users U ON U.USER_ID = O.USER_ID
+                        JOIN SponsorCompany S ON S.SPONSOR_ID = O.SPONSOR_ID
+                        WHERE O.USER_OD = ?
+                        GROUP BY O.USER_ID, O.SPONSOR_ID;`
+        connection.query(query,[USER_ID],(queryError, result)=> {
+            if(queryError){
+                console.error(`Error fetching invoices:`, queryError);
+                res.status(500).json({ error: 'Internal server error' });
+                return;
+            }
+            else{
+                res.status(200).json(result);
+                return;
+            }
+        });
+    }
+});
+
 
 // Takes in a new user for the database  
 app.post('/users', (req, res) => {
