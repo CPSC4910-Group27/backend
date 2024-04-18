@@ -819,6 +819,84 @@ app.get('/password_change',(req, res) => {
     }
 });
 
+app.get('/orders', (req, res) => {
+    const USER_ID = req.query.USER_ID;
+    const SPONSOR_ID = req.query.SPONSOR_ID;
+
+    if(!USER_ID && !SPONSOR_ID)
+    {
+        const query = `SELECT O.*, CONCAT(U.FNAME, ' ', U.LNAME) as FULLNAME, S.SPONSOR_NAME FROM ORDERS O
+                        JOIN Users U ON U.USER_ID = O.USER_ID
+                        JOIN SponsorCompany S ON S.SPONSOR_ID = O.SPONSOR_ID`
+        connection.query(query,(queryError, result)=> {
+            if(queryError){
+                console.error(`Error fetching orders:`, queryError);
+                res.status(500).json({ error: 'Internal server error' });
+                return;
+            }
+            else{
+                res.status(200).json(result);
+                return;
+            }
+        });
+    }
+    else if(SPONSOR_ID && USER_ID)
+    {
+        const query = `SELECT O.*, CONCAT(U.FNAME, ' ', U.LNAME) as FULLNAME, S.SPONSOR_NAME FROM ORDERS O
+                        JOIN Users U ON U.USER_ID = O.USER_ID
+                        JOIN SponsorCompany S ON S.SPONSOR_ID = O.SPONSOR_ID
+                        WHERE O.USER_ID = ? AND O.SPONSOR_ID = ?`
+        connection.query(query,[USER_ID,SPONSOR_ID],(queryError, result)=> {
+            if(queryError){
+                console.error(`Error fetching orders:`, queryError);
+                res.status(500).json({ error: 'Internal server error' });
+                return;
+            }
+            else{
+                res.status(200).json(result);
+                return;
+            }
+        });
+    }
+    else if(SPONSOR_ID)
+    {
+        const query = `SELECT O.*, CONCAT(U.FNAME, ' ', U.LNAME) as FULLNAME, S.SPONSOR_NAME FROM ORDERS O
+                        JOIN Users U ON U.USER_ID = O.USER_ID
+                        JOIN SponsorCompany S ON S.SPONSOR_ID = O.SPONSOR_ID
+                        WHERE O.SPONSOR_ID = ?`
+        connection.query(query,[SPONSOR_ID],(queryError, result)=> {
+            if(queryError){
+                console.error(`Error fetching orders:`, queryError);
+                res.status(500).json({ error: 'Internal server error' });
+                return;
+            }
+            else{
+                res.status(200).json(result);
+                return;
+            }
+        });
+    }
+    else if(USER_ID)
+    {
+        const query = `SELECT O.*, CONCAT(U.FNAME, ' ', U.LNAME) as FULLNAME, S.SPONSOR_NAME FROM ORDERS O
+                        JOIN Users U ON U.USER_ID = O.USER_ID
+                        JOIN SponsorCompany S ON S.SPONSOR_ID = O.SPONSOR_ID
+                        WHERE O.USER_ID = ?`
+        connection.query(query,[USER_ID],(queryError, result)=> {
+            if(queryError){
+                console.error(`Error fetching orders:`, queryError);
+                res.status(500).json({ error: 'Internal server error' });
+                return;
+            }
+            else{
+                res.status(200).json(result);
+                return;
+            }
+        });
+    }
+});
+
+
 // Takes in a new user for the database  
 app.post('/users', (req, res) => {
     const {USER_TYPE, EMAIL, USERNAME, FNAME, LNAME} = req.body;
