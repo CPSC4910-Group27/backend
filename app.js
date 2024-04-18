@@ -930,7 +930,22 @@ app.post('/admins',(req,res)=> {
         res.json({ message: 'Admin added successfully'});
     })
 })
+app.post('/sponsorcompany',(req,res)=>{
+    const {SPONSOR_NAME} = req.body;
 
+    if(!SPONSOR_NAME){
+        return res.status(400).json({ error: 'Missing required fields' });
+    }
+
+    const companyQuery = `INSERT INTO SponsorCompany (SPONSOR_NAME) VALUES (?)`
+    connection.query(companyQuery, [companyQuery], (error, results) => {
+        if(error){
+            console.error('Error executing query:', error);
+            return res.status(500).json({ error: 'Internal Server Error' });
+        }
+        return res.status(200).json({ message: 'Company added successfully'});
+    })
+})
 // Takes in a new sponsor to Sponsors table
 app.post('/sponsors', (req, res) => {
     const { SPONSOR_ADMIN_ID, SPONSOR_COMPANY_ID, USER_ID} = req.body;
