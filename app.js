@@ -930,7 +930,7 @@ app.get('/invoices', (req, res) => {
                         FROM ORDERS O
                         JOIN Users U ON U.USER_ID = O.USER_ID
                         JOIN SponsorCompany S ON S.SPONSOR_ID = O.SPONSOR_ID
-                        WHERE USER_ID = ? AND SPONSOR_ID = ?
+                        WHERE SPONSOR_ID = ?
                         GROUP BY O.SPONSOR_ID;`
         connection.query(query,[SPONSOR_ID],(queryError, result)=> {
             if(queryError){
