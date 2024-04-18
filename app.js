@@ -903,42 +903,37 @@ app.get('/orders', (req, res) => {
 app.get('/invoices', (req, res) => {
     const SPONSOR_ID = req.query.SPONSOR_ID;
 
-    if(!SPONSOR_ID)
-    {
+    if (!SPONSOR_ID) {
         const query = `SELECT O.SPONSOR_ID, O.USER_ID, SUM(O.POINT_TOTAL) AS POINTSREDEEMED, SUM(O.DOLLAR_AMOUNT) AS TOTALSPENT, 
-                        CONCAT(U.FNAME, ' ', U.LNAME) AS FULLNAME, S.SPONSOR_NAME 
+                        CONCAT(U.FNAME, ' ', U.LNAME) AS FULLNAME, S.SPONSOR_NAME, MIN(O.ORDER_DATE) AS EARLIEST_ORDER_DATE, MAX(O.ORDER_DATE) AS LATEST_ORDER_DATE
                         FROM ORDERS O
                         JOIN Users U ON U.USER_ID = O.USER_ID
                         JOIN SponsorCompany S ON S.SPONSOR_ID = O.SPONSOR_ID
-                        GROUP BY O.SPONSOR_ID, O.USER_ID;`
-        connection.query(query,(queryError, result)=> {
-            if(queryError){
+                        GROUP BY O.SPONSOR_ID, O.USER_ID;`;
+        connection.query(query, (queryError, result) => {
+            if (queryError) {
                 console.error(`Error fetching invoices:`, queryError);
                 res.status(500).json({ error: 'Internal server error' });
                 return;
-            }
-            else{
+            } else {
                 res.status(200).json(result);
                 return;
             }
         });
-    }
-    else if(SPONSOR_ID)
-    {
+    } else if (SPONSOR_ID) {
         const query = `SELECT O.SPONSOR_ID, O.USER_ID, SUM(O.POINT_TOTAL) AS POINTSREDEEMED, SUM(O.DOLLAR_AMOUNT) AS TOTALSPENT, 
-                        CONCAT(U.FNAME, ' ', U.LNAME) AS FULLNAME, S.SPONSOR_NAME 
+                        CONCAT(U.FNAME, ' ', U.LNAME) AS FULLNAME, S.SPONSOR_NAME, MIN(O.ORDER_DATE) AS EARLIEST_ORDER_DATE, MAX(O.ORDER_DATE) AS LATEST_ORDER_DATE
                         FROM ORDERS O
                         JOIN Users U ON U.USER_ID = O.USER_ID
                         JOIN SponsorCompany S ON S.SPONSOR_ID = O.SPONSOR_ID
                         WHERE SPONSOR_ID = ?
-                        GROUP BY O.SPONSOR_ID;`
-        connection.query(query,[SPONSOR_ID],(queryError, result)=> {
-            if(queryError){
+                        GROUP BY O.SPONSOR_ID;`;
+        connection.query(query, [SPONSOR_ID], (queryError, result) => {
+            if (queryError) {
                 console.error(`Error fetching invoices:`, queryError);
                 res.status(500).json({ error: 'Internal server error' });
                 return;
-            }
-            else{
+            } else {
                 res.status(200).json(result);
                 return;
             }
