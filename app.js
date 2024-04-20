@@ -963,6 +963,103 @@ app.get('/invoices', (req, res) => {
     }
 });
 
+// RETURNS POINT TRACKING
+app.get('/point_track',(req, res) => {
+    const USER_ID = req.query.USER_ID;
+    const SPONSOR_ID = req.query.SPONSOR_ID;
+    if(!USER_ID && !SPONSOR_ID)
+    {
+        const query = `SELECT CONCAT(U2.FNAME, ' ', U2.LNAME) AS AUDIT_DRIVER_FULL_NAME, D.POINTS, A.AUDIT_ID, CONCAT(U1.FNAME, ' ', U1.LNAME) AS USER_FULL_NAME, 
+		                P.AUDIT_POINTS, P.AUDIT_REASON, A.AUDIT_DATE
+                        FROM AuditEntry A
+                        JOIN Users U1 ON U1.USER_ID = A.USER_ID
+                        JOIN POINTAUDIT P ON P.AUDIT_ID = A.AUDIT_ID
+                        JOIN Users U2 ON U2.USER_ID = P.AUDIT_DRIVER 
+                        JOIN DriverSponsorships D ON D.USER_ID = P.AUDIT_DRIVER AND D.SPONSOR_ID = P.AUDIT_SPONSOR
+                        WHERE AUDIT_TYPE LIKE 'POINT CHANGE'`
+        connection.query(query,(queryError, result)=> {
+            if(queryError){
+                console.error(`Error fetching point tracking:`, queryError);
+                res.status(500).json({ error: 'Internal server error' });
+                return;
+            }
+            else{
+                res.status(200).json(result);
+                return;
+            }
+        });
+    }
+    else if(SPONSOR_ID && USER_ID)
+    {
+        const query = `SELECT CONCAT(U2.FNAME, ' ', U2.LNAME) AS AUDIT_DRIVER_FULL_NAME, D.POINTS, A.AUDIT_ID, CONCAT(U1.FNAME, ' ', U1.LNAME) AS USER_FULL_NAME, 
+		                P.AUDIT_POINTS, P.AUDIT_REASON, A.AUDIT_DATE
+                        FROM AuditEntry A
+                        JOIN Users U1 ON U1.USER_ID = A.USER_ID
+                        JOIN POINTAUDIT P ON P.AUDIT_ID = A.AUDIT_ID
+                        JOIN Users U2 ON U2.USER_ID = P.AUDIT_DRIVER 
+                        JOIN DriverSponsorships D ON D.USER_ID = P.AUDIT_DRIVER AND D.SPONSOR_ID = P.AUDIT_SPONSOR
+                        WHERE AUDIT_TYPE LIKE 'POINT CHANGE'
+                        AND P.AUDIT_DRIVER = ? AND AUDIT_SPONSOR = ?`
+        connection.query(query,[USER_ID,SPONSOR_ID],(queryError, result)=> {
+            if(queryError){
+                console.error(`Error fetching point tracking:`, queryError);
+                res.status(500).json({ error: 'Internal server error' });
+                return;
+            }
+            else{
+                res.status(200).json(result);
+                return;
+            }
+        });
+    }
+    else if(SPONSOR_ID)
+    {
+        const query = `SELECT CONCAT(U2.FNAME, ' ', U2.LNAME) AS AUDIT_DRIVER_FULL_NAME, D.POINTS, A.AUDIT_ID, CONCAT(U1.FNAME, ' ', U1.LNAME) AS USER_FULL_NAME, 
+		                P.AUDIT_POINTS, P.AUDIT_REASON, A.AUDIT_DATE
+                        FROM AuditEntry A
+                        JOIN Users U1 ON U1.USER_ID = A.USER_ID
+                        JOIN POINTAUDIT P ON P.AUDIT_ID = A.AUDIT_ID
+                        JOIN Users U2 ON U2.USER_ID = P.AUDIT_DRIVER 
+                        JOIN DriverSponsorships D ON D.USER_ID = P.AUDIT_DRIVER AND D.SPONSOR_ID = P.AUDIT_SPONSOR
+                        WHERE AUDIT_TYPE LIKE 'POINT CHANGE'
+                        AND P.AUDIT_SPONSOR = ?`
+        connection.query(query,[SPONSOR_ID],(queryError, result)=> {
+            if(queryError){
+                console.error(`Error fetching point tracking:`, queryError);
+                res.status(500).json({ error: 'Internal server error' });
+                return;
+            }
+            else{
+                res.status(200).json(result);
+                return;
+            }
+        });
+    }
+    else if(USER_ID)
+    {
+        const query = `SELECT CONCAT(U2.FNAME, ' ', U2.LNAME) AS AUDIT_DRIVER_FULL_NAME, D.POINTS, A.AUDIT_ID, CONCAT(U1.FNAME, ' ', U1.LNAME) AS USER_FULL_NAME, 
+		                P.AUDIT_POINTS, P.AUDIT_REASON, A.AUDIT_DATE
+                        FROM AuditEntry A
+                        JOIN Users U1 ON U1.USER_ID = A.USER_ID
+                        JOIN POINTAUDIT P ON P.AUDIT_ID = A.AUDIT_ID
+                        JOIN Users U2 ON U2.USER_ID = P.AUDIT_DRIVER 
+                        JOIN DriverSponsorships D ON D.USER_ID = P.AUDIT_DRIVER AND D.SPONSOR_ID = P.AUDIT_SPONSOR
+                        WHERE AUDIT_TYPE LIKE 'POINT CHANGE'
+                        AND P.AUDIT_DRIVER = ?`
+        connection.query(query,[USER_ID],(queryError, result)=> {
+            if(queryError){
+                console.error(`Error fetching point tracking:`, queryError);
+                res.status(500).json({ error: 'Internal server error' });
+                return;
+            }
+            else{
+                res.status(200).json(result);
+                return;
+            }
+        });
+    }
+
+});
 
 // Takes in a new user for the database  
 app.post('/users', (req, res) => {
