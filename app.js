@@ -113,7 +113,8 @@ app.get('/users', (req, res) => {
     const username = req.query.USERNAME;
     const USER_TYPE = req.query.USER_TYPE;
     const EMAIL = req.query.EMAIL;
-    if (!username && !USER_TYPE && !EMAIL){
+    const USER_ID = req.query.USER_ID;
+    if (!username && !USER_TYPE && !EMAIL && !USER_ID){
         query = 'SELECT * FROM Users'
     }
     else if (username){
@@ -124,6 +125,9 @@ app.get('/users', (req, res) => {
     }
     else if (EMAIL){
         query = "SELECT * FROM Users WHERE EMAIL LIKE '" + EMAIL.toString() + "'"; 
+    }
+    else if (USER_ID){
+        query = "SELECT * FROM Users WHERE USER_ID = '" + USER_ID.toString() + "'"; 
     }
     else{
             res.status(400).json({ error: 'Missing Query Params' });
@@ -539,7 +543,14 @@ app.get('/point_change',(req, res) => {
     const SPONSOR_ID = req.query.SPONSOR_ID;
     if(!USER_ID && !SPONSOR_ID)
     {
-        const query = `SELECT * FROM AuditEntry A JOIN POINTAUDIT P ON P.AUDIT_ID = A.AUDIT_ID WHERE AUDIT_TYPE LIKE 'POINT CHANGE'`
+        const query = `SELECT A.*, P.*, S.*, CONCAT(U1.FNAME, ' ', U1.LNAME) AS USER_FULL_NAME, 
+                        CONCAT(U2.FNAME, ' ', U2.LNAME) AS AUDIT_DRIVER_FULL_NAME
+                        FROM AuditEntry A
+                        JOIN Users U1 ON U1.USER_ID = A.USER_ID
+                        JOIN POINTAUDIT P ON P.AUDIT_ID = A.AUDIT_ID
+                        JOIN SponsorCompany S ON S.SPONSOR_ID = P.AUDIT_SPONSOR
+                        JOIN Users U2 ON U2.USER_ID = P.AUDIT_DRIVER 
+                        WHERE AUDIT_TYPE LIKE 'POINT CHANGE'`
         connection.query(query,(queryError, result)=> {
             if(queryError){
                 console.error(`Error fetching point changes:`, queryError);
@@ -554,10 +565,15 @@ app.get('/point_change',(req, res) => {
     }
     else if(SPONSOR_ID && USER_ID)
     {
-        const query = `SELECT * 
-        FROM AuditEntry A JOIN POINTAUDIT P ON P.AUDIT_ID = A.AUDIT_ID 
-        WHERE AUDIT_TYPE LIKE 'POINT CHANGE'
-            AND P.AUDIT_DRIVER = ? AND AUDIT_SPONSOR = ?`
+        const query = `SELECT A.*, P.*, S.*, CONCAT(U1.FNAME, ' ', U1.LNAME) AS USER_FULL_NAME, 
+                        CONCAT(U2.FNAME, ' ', U2.LNAME) AS AUDIT_DRIVER_FULL_NAME
+                        FROM AuditEntry A
+                        JOIN Users U1 ON U1.USER_ID = A.USER_ID
+                        JOIN POINTAUDIT P ON P.AUDIT_ID = A.AUDIT_ID
+                        JOIN SponsorCompany S ON S.SPONSOR_ID = P.AUDIT_SPONSOR
+                        JOIN Users U2 ON U2.USER_ID = P.AUDIT_DRIVER 
+                        WHERE AUDIT_TYPE LIKE 'POINT CHANGE'
+                        AND P.AUDIT_DRIVER = ? AND AUDIT_SPONSOR = ?`
         connection.query(query,[USER_ID,SPONSOR_ID],(queryError, result)=> {
             if(queryError){
                 console.error(`Error fetching point changes:`, queryError);
@@ -572,10 +588,15 @@ app.get('/point_change',(req, res) => {
     }
     else if(SPONSOR_ID)
     {
-        const query = `SELECT * 
-        FROM AuditEntry A JOIN POINTAUDIT P ON P.AUDIT_ID = A.AUDIT_ID 
-        WHERE AUDIT_TYPE LIKE 'POINT CHANGE'
-            AND AUDIT_SPONSOR = ?`
+        const query = `SELECT A.*, P.*, S.*, CONCAT(U1.FNAME, ' ', U1.LNAME) AS USER_FULL_NAME, 
+                        CONCAT(U2.FNAME, ' ', U2.LNAME) AS AUDIT_DRIVER_FULL_NAME
+                        FROM AuditEntry A
+                        JOIN Users U1 ON U1.USER_ID = A.USER_ID
+                        JOIN POINTAUDIT P ON P.AUDIT_ID = A.AUDIT_ID
+                        JOIN SponsorCompany S ON S.SPONSOR_ID = P.AUDIT_SPONSOR
+                        JOIN Users U2 ON U2.USER_ID = P.AUDIT_DRIVER 
+                        WHERE AUDIT_TYPE LIKE 'POINT CHANGE'
+                        AND P.AUDIT_SPONSOR = ?`
         connection.query(query,[SPONSOR_ID],(queryError, result)=> {
             if(queryError){
                 console.error(`Error fetching point changes:`, queryError);
@@ -590,10 +611,15 @@ app.get('/point_change',(req, res) => {
     }
     else if(USER_ID)
     {
-        const query = `SELECT * 
-        FROM AuditEntry A JOIN POINTAUDIT P ON P.AUDIT_ID = A.AUDIT_ID 
-        WHERE AUDIT_TYPE LIKE 'POINT CHANGE'
-            AND P.AUDIT_DRIVER = ?`
+        const query = `SELECT A.*, P.*, S.*, CONCAT(U1.FNAME, ' ', U1.LNAME) AS USER_FULL_NAME, 
+                        CONCAT(U2.FNAME, ' ', U2.LNAME) AS AUDIT_DRIVER_FULL_NAME
+                        FROM AuditEntry A
+                        JOIN Users U1 ON U1.USER_ID = A.USER_ID
+                        JOIN POINTAUDIT P ON P.AUDIT_ID = A.AUDIT_ID
+                        JOIN SponsorCompany S ON S.SPONSOR_ID = P.AUDIT_SPONSOR
+                        JOIN Users U2 ON U2.USER_ID = P.AUDIT_DRIVER 
+                        WHERE AUDIT_TYPE LIKE 'POINT CHANGE'
+                        AND P.AUDIT_DRIVER = ?`
         connection.query(query,[USER_ID],(queryError, result)=> {
             if(queryError){
                 console.error(`Error fetching point changes:`, queryError);
@@ -608,6 +634,433 @@ app.get('/point_change',(req, res) => {
     }
 
 });
+
+// RETURNS APPLICATION CHANGES
+app.get('/application_change',(req, res) => {
+    const USER_ID = req.query.USER_ID;
+    const SPONSOR_ID = req.query.SPONSOR_ID;
+    if(!USER_ID && !SPONSOR_ID)
+    {
+        const query = `SELECT A.*, P.*, S.*, CONCAT(U1.FNAME, ' ', U1.LNAME) AS USER_FULL_NAME, 
+                        CONCAT(U2.FNAME, ' ', U2.LNAME) AS AUDIT_DRIVER_FULL_NAME
+                        FROM AuditEntry A 
+                        JOIN Users U1 ON U1.USER_ID = A.USER_ID
+                        JOIN APPAUDIT P ON P.AUDIT_ID = A.AUDIT_ID
+                        JOIN SponsorCompany S ON S.SPONSOR_ID = P.AUDIT_SPONSOR
+                        JOIN Users U2 ON U2.USER_ID = P.AUDIT_DRIVER 
+                        WHERE AUDIT_TYPE LIKE 'DRIVER APPLICATION'`
+        connection.query(query,(queryError, result)=> {
+            if(queryError){
+                console.error(`Error fetching application changes:`, queryError);
+                res.status(500).json({ error: 'Internal server error' });
+                return;
+            }
+            else{
+                res.status(200).json(result);
+                return;
+            }
+        });
+    }
+    else if(SPONSOR_ID && USER_ID)
+    {
+        const query = `SELECT A.*, P.*, S.*, CONCAT(U1.FNAME, ' ', U1.LNAME) AS USER_FULL_NAME, 
+                        CONCAT(U2.FNAME, ' ', U2.LNAME) AS AUDIT_DRIVER_FULL_NAME
+                        FROM AuditEntry A 
+                        JOIN Users U1 ON U1.USER_ID = A.USER_ID
+                        JOIN APPAUDIT P ON P.AUDIT_ID = A.AUDIT_ID
+                        JOIN SponsorCompany S ON S.SPONSOR_ID = P.AUDIT_SPONSOR
+                        JOIN Users U2 ON U2.USER_ID = P.AUDIT_DRIVER 
+                        WHERE AUDIT_TYPE LIKE 'DRIVER APPLICATION'
+                        AND P.AUDIT_DRIVER = ? AND P.AUDIT_SPONSOR = ?;`
+        connection.query(query,[USER_ID,SPONSOR_ID],(queryError, result)=> {
+            if(queryError){
+                console.error(`Error fetching application changes:`, queryError);
+                res.status(500).json({ error: 'Internal server error' });
+                return;
+            }
+            else{
+                res.status(200).json(result);
+                return;
+            }
+        });
+    }
+    else if(SPONSOR_ID)
+    {
+        const query = `SELECT A.*, P.*, S.*, CONCAT(U1.FNAME, ' ', U1.LNAME) AS USER_FULL_NAME, 
+                        CONCAT(U2.FNAME, ' ', U2.LNAME) AS AUDIT_DRIVER_FULL_NAME
+                        FROM AuditEntry A 
+                        JOIN Users U1 ON U1.USER_ID = A.USER_ID
+                        JOIN APPAUDIT P ON P.AUDIT_ID = A.AUDIT_ID
+                        JOIN SponsorCompany S ON S.SPONSOR_ID = P.AUDIT_SPONSOR
+                        JOIN Users U2 ON U2.USER_ID = P.AUDIT_DRIVER 
+                        WHERE AUDIT_TYPE LIKE 'DRIVER APPLICATION'
+                        AND P.AUDIT_SPONSOR = ?;`
+        connection.query(query,[SPONSOR_ID],(queryError, result)=> {
+            if(queryError){
+                console.error(`Error fetching application changes:`, queryError);
+                res.status(500).json({ error: 'Internal server error' });
+                return;
+            }
+            else{
+                res.status(200).json(result);
+                return;
+            }
+        });
+    }
+    else if(USER_ID)
+    {
+        const query = `SELECT A.*, P.*, S.*, CONCAT(U1.FNAME, ' ', U1.LNAME) AS USER_FULL_NAME, 
+                        CONCAT(U2.FNAME, ' ', U2.LNAME) AS AUDIT_DRIVER_FULL_NAME
+                        FROM AuditEntry A 
+                        JOIN Users U1 ON U1.USER_ID = A.USER_ID
+                        JOIN APPAUDIT P ON P.AUDIT_ID = A.AUDIT_ID
+                        JOIN SponsorCompany S ON S.SPONSOR_ID = P.AUDIT_SPONSOR
+                        JOIN Users U2 ON U2.USER_ID = P.AUDIT_DRIVER 
+                        WHERE AUDIT_TYPE LIKE 'DRIVER APPLICATION'
+                        AND P.AUDIT_DRIVER = ?;`
+        connection.query(query,[USER_ID],(queryError, result)=> {
+            if(queryError){
+                console.error(`Error fetching application changes:`, queryError);
+                res.status(500).json({ error: 'Internal server error' });
+                return;
+            }
+            else{
+                res.status(200).json(result);
+                return;
+            }
+        });
+    }
+
+});
+
+app.get('/login_attempt',(req, res) => {
+    const SPONSOR_ID = req.query.SPONSOR_ID;
+    if(!SPONSOR_ID)
+    {
+        const query = `SELECT * FROM AuditEntry A JOIN LOGINAUDIT P ON P.AUDIT_ID = A.AUDIT_ID 
+        WHERE AUDIT_TYPE LIKE 'LOG IN ATTEMPT'`
+        connection.query(query,(queryError, result)=> {
+            if(queryError){
+                console.error(`Error fetching login attempt:`, queryError);
+                res.status(500).json({ error: 'Internal server error' });
+                return;
+            }
+            else{
+                res.status(200).json(result);
+                return;
+            }
+        });
+    }
+    else
+    {
+        const query = `SELECT * FROM AuditEntry A 
+                        JOIN LOGINAUDIT P ON P.AUDIT_ID = A.AUDIT_ID 
+                        JOIN Users U ON U.EMAIL = P.AUDIT_USERNAME
+                        LEFT JOIN DriverSponsorships D ON D.USER_ID = U.USER_ID
+                        LEFT JOIN Sponsors S ON S.USER_ID = U.USER_ID
+                        WHERE (AUDIT_TYPE LIKE 'LOG IN ATTEMPT' AND (D.SPONSOR_ID = ? OR S.SPONSOR_ID = ?));`
+        connection.query(query,[SPONSOR_ID, SPONSOR_ID],(queryError, result)=> {
+            if(queryError){
+                console.error(`Error fetching login attempt:`, queryError);
+                res.status(500).json({ error: 'Internal server error' });
+                return;
+            }
+            else{
+                res.status(200).json(result);
+                return;
+            }
+        });
+    }
+});
+
+app.get('/password_change',(req, res) => {
+    const SPONSOR_ID = req.query.SPONSOR_ID;
+    if(!SPONSOR_ID)
+    {
+        const query = `SELECT A.AUDIT_ID, A.USER_ID, P.AUDIT_USER, 
+                        CONCAT(U1.FNAME, ' ', U1.LNAME) AS USER_FULL_NAME, 
+                        CONCAT(U2.FNAME, ' ', U2.LNAME) AS AUDIT_USER_FULL_NAME, P.AUDIT_CHANGE_TYPE, A.AUDIT_DATE 
+                        FROM AuditEntry A 
+                        JOIN PASSAUDIT P ON P.AUDIT_ID = A.AUDIT_ID 
+                        LEFT JOIN Users U1 ON U1.USER_ID = A.USER_ID
+                        LEFT JOIN Users U2 ON U2.USER_ID = P.AUDIT_USER
+                        WHERE AUDIT_TYPE LIKE 'PASSWORD CHANGE';`
+        connection.query(query,(queryError, result)=> {
+            if(queryError){
+                console.error(`Error fetching password change:`, queryError);
+                res.status(500).json({ error: 'Internal server error' });
+                return;
+            }
+            else{
+                res.status(200).json(result);
+                return;
+            }
+        });
+        
+    }
+    else
+    {
+        const query = `SELECT A.AUDIT_ID, A.USER_ID, P.AUDIT_USER, CONCAT(U1.FNAME, ' ', U1.LNAME) AS USER_FULL_NAME, 
+                        CONCAT(U2.FNAME, ' ', U2.LNAME) AS AUDIT_USER_FULL_NAME, P.AUDIT_CHANGE_TYPE, A.AUDIT_DATE 
+                        FROM AuditEntry A 
+                        JOIN PASSAUDIT P ON P.AUDIT_ID = A.AUDIT_ID 
+                        LEFT JOIN DriverSponsorships D ON D.USER_ID = P.AUDIT_USER
+                        LEFT JOIN Sponsors S ON S.USER_ID = P.AUDIT_USER
+                        LEFT JOIN Users U1 ON U1.USER_ID = A.USER_ID
+                        LEFT JOIN Users U2 ON U2.USER_ID = P.AUDIT_USER
+                        WHERE (A.AUDIT_TYPE LIKE 'PASSWORD CHANGE' AND (D.SPONSOR_ID = ? OR S.SPONSOR_ID = ?));`
+        connection.query(query,[SPONSOR_ID, SPONSOR_ID],(queryError, result)=> {
+            if(queryError){
+                console.error(`Error fetching password change:`, queryError);
+                res.status(500).json({ error: 'Internal server error' });
+                return;
+            }
+            else{
+                res.status(200).json(result);
+                return;
+            }
+        });
+    }
+});
+
+app.get('/orders', (req, res) => {
+    const USER_ID = req.query.USER_ID;
+    const SPONSOR_ID = req.query.SPONSOR_ID;
+
+    if(!USER_ID && !SPONSOR_ID)
+    {
+        const query = `SELECT O.*, CONCAT(U.FNAME, ' ', U.LNAME) as FULLNAME, S.SPONSOR_NAME FROM ORDERS O
+                        JOIN Users U ON U.USER_ID = O.USER_ID
+                        JOIN SponsorCompany S ON S.SPONSOR_ID = O.SPONSOR_ID`
+        connection.query(query,(queryError, result)=> {
+            if(queryError){
+                console.error(`Error fetching orders:`, queryError);
+                res.status(500).json({ error: 'Internal server error' });
+                return;
+            }
+            else{
+                res.status(200).json(result);
+                return;
+            }
+        });
+    }
+    else if(SPONSOR_ID && USER_ID)
+    {
+        const query = `SELECT O.*, CONCAT(U.FNAME, ' ', U.LNAME) as FULLNAME, S.SPONSOR_NAME FROM ORDERS O
+                        JOIN Users U ON U.USER_ID = O.USER_ID
+                        JOIN SponsorCompany S ON S.SPONSOR_ID = O.SPONSOR_ID
+                        WHERE O.USER_ID = ? AND O.SPONSOR_ID = ?`
+        connection.query(query,[USER_ID,SPONSOR_ID],(queryError, result)=> {
+            if(queryError){
+                console.error(`Error fetching orders:`, queryError);
+                res.status(500).json({ error: 'Internal server error' });
+                return;
+            }
+            else{
+                res.status(200).json(result);
+                return;
+            }
+        });
+    }
+    else if(SPONSOR_ID)
+    {
+        const query = `SELECT O.*, CONCAT(U.FNAME, ' ', U.LNAME) as FULLNAME, S.SPONSOR_NAME FROM ORDERS O
+                        JOIN Users U ON U.USER_ID = O.USER_ID
+                        JOIN SponsorCompany S ON S.SPONSOR_ID = O.SPONSOR_ID
+                        WHERE O.SPONSOR_ID = ?`
+        connection.query(query,[SPONSOR_ID],(queryError, result)=> {
+            if(queryError){
+                console.error(`Error fetching orders:`, queryError);
+                res.status(500).json({ error: 'Internal server error' });
+                return;
+            }
+            else{
+                res.status(200).json(result);
+                return;
+            }
+        });
+    }
+    else if(USER_ID)
+    {
+        const query = `SELECT O.*, CONCAT(U.FNAME, ' ', U.LNAME) as FULLNAME, S.SPONSOR_NAME FROM ORDERS O
+                        JOIN Users U ON U.USER_ID = O.USER_ID
+                        JOIN SponsorCompany S ON S.SPONSOR_ID = O.SPONSOR_ID
+                        WHERE O.USER_ID = ?`
+        connection.query(query,[USER_ID],(queryError, result)=> {
+            if(queryError){
+                console.error(`Error fetching orders:`, queryError);
+                res.status(500).json({ error: 'Internal server error' });
+                return;
+            }
+            else{
+                res.status(200).json(result);
+                return;
+            }
+        });
+    }
+});
+
+app.get('/invoices', (req, res) => {
+    const SPONSOR_ID = req.query.SPONSOR_ID;
+    const START_DATE = req.query.START_DATE;
+    const END_DATE = req.query.END_DATE;
+
+    if (SPONSOR_ID && START_DATE && END_DATE) {
+        const query = `SELECT O.*,SUM(O.POINT_TOTAL) AS POINTSREDEEMED, SUM(O.DOLLAR_AMOUNT) AS TOTALSPENT,
+                        CONCAT(U.FNAME, ' ', U.LNAME) AS FULLNAME, S.SPONSOR_NAME
+                        FROM ORDERS O
+                        JOIN Users U ON U.USER_ID = O.USER_ID
+                        JOIN SponsorCompany S ON S.SPONSOR_ID = O.SPONSOR_ID
+                        WHERE O.SPONSOR_ID = ? AND O.ORDER_DATE BETWEEN ? AND ?
+                        GROUP BY O.SPONSOR_ID, O.USER_ID;`;
+        connection.query(query, [SPONSOR_ID, START_DATE, END_DATE], (queryError, result) => {
+            if (queryError) {
+                console.error(`Error fetching invoices:`, queryError);
+                res.status(500).json({ error: 'Internal server error' });
+                return;
+            } else {
+                res.status(200).json(result);
+                return;
+            }
+        });
+    } else if (SPONSOR_ID) {
+        // If only SPONSOR_ID is provided without a date range, fetch all invoices for the sponsor
+        const query = `SELECT O.*,SUM(O.POINT_TOTAL) AS POINTSREDEEMED, SUM(O.DOLLAR_AMOUNT) AS TOTALSPENT,
+                        CONCAT(U.FNAME, ' ', U.LNAME) AS FULLNAME, S.SPONSOR_NAME
+                        FROM ORDERS O
+                        JOIN Users U ON U.USER_ID = O.USER_ID
+                        JOIN SponsorCompany S ON S.SPONSOR_ID = O.SPONSOR_ID
+                        WHERE O.SPONSOR_ID = ?
+                        GROUP BY O.SPONSOR_ID, O.USER_ID;`;
+        connection.query(query, [SPONSOR_ID], (queryError, result) => {
+            if (queryError) {
+                console.error(`Error fetching invoices:`, queryError);
+                res.status(500).json({ error: 'Internal server error' });
+                return;
+            } else {
+                res.status(200).json(result);
+                return;
+            }
+        });
+    } else {
+        // If neither SPONSOR_ID nor a date range is provided, fetch all invoices
+        const query = `SELECT O.*,SUM(O.POINT_TOTAL) AS POINTSREDEEMED, SUM(O.DOLLAR_AMOUNT) AS TOTALSPENT,
+                        CONCAT(U.FNAME, ' ', U.LNAME) AS FULLNAME, S.SPONSOR_NAME
+                        FROM ORDERS O
+                        JOIN Users U ON U.USER_ID = O.USER_ID
+                        JOIN SponsorCompany S ON S.SPONSOR_ID = O.SPONSOR_ID
+                        GROUP BY O.SPONSOR_ID, O.USER_ID;`;
+        connection.query(query, (queryError, result) => {
+            if (queryError) {
+                console.error(`Error fetching invoices:`, queryError);
+                res.status(500).json({ error: 'Internal server error' });
+                return;
+            } else {
+                res.status(200).json(result);
+                return;
+            }
+        });
+    }
+});
+
+// RETURNS POINT TRACKING
+app.get('/point_track',(req, res) => {
+    const USER_ID = req.query.USER_ID;
+    const SPONSOR_ID = req.query.SPONSOR_ID;
+    if(!USER_ID && !SPONSOR_ID)
+    {
+        const query = `SELECT CONCAT(U2.FNAME, ' ', U2.LNAME) AS AUDIT_DRIVER_FULL_NAME, D.POINTS, A.AUDIT_ID, CONCAT(U1.FNAME, ' ', U1.LNAME) AS USER_FULL_NAME, 
+		                P.AUDIT_POINTS, P.AUDIT_REASON, A.AUDIT_DATE
+                        FROM AuditEntry A
+                        JOIN Users U1 ON U1.USER_ID = A.USER_ID
+                        JOIN POINTAUDIT P ON P.AUDIT_ID = A.AUDIT_ID
+                        JOIN Users U2 ON U2.USER_ID = P.AUDIT_DRIVER 
+                        JOIN DriverSponsorships D ON D.USER_ID = P.AUDIT_DRIVER AND D.SPONSOR_ID = P.AUDIT_SPONSOR
+                        WHERE AUDIT_TYPE LIKE 'POINT CHANGE'`
+        connection.query(query,(queryError, result)=> {
+            if(queryError){
+                console.error(`Error fetching point tracking:`, queryError);
+                res.status(500).json({ error: 'Internal server error' });
+                return;
+            }
+            else{
+                res.status(200).json(result);
+                return;
+            }
+        });
+    }
+    else if(SPONSOR_ID && USER_ID)
+    {
+        const query = `SELECT CONCAT(U2.FNAME, ' ', U2.LNAME) AS AUDIT_DRIVER_FULL_NAME, D.POINTS, A.AUDIT_ID, CONCAT(U1.FNAME, ' ', U1.LNAME) AS USER_FULL_NAME, 
+		                P.AUDIT_POINTS, P.AUDIT_REASON, A.AUDIT_DATE
+                        FROM AuditEntry A
+                        JOIN Users U1 ON U1.USER_ID = A.USER_ID
+                        JOIN POINTAUDIT P ON P.AUDIT_ID = A.AUDIT_ID
+                        JOIN Users U2 ON U2.USER_ID = P.AUDIT_DRIVER 
+                        JOIN DriverSponsorships D ON D.USER_ID = P.AUDIT_DRIVER AND D.SPONSOR_ID = P.AUDIT_SPONSOR
+                        WHERE AUDIT_TYPE LIKE 'POINT CHANGE'
+                        AND P.AUDIT_DRIVER = ? AND AUDIT_SPONSOR = ?`
+        connection.query(query,[USER_ID,SPONSOR_ID],(queryError, result)=> {
+            if(queryError){
+                console.error(`Error fetching point tracking:`, queryError);
+                res.status(500).json({ error: 'Internal server error' });
+                return;
+            }
+            else{
+                res.status(200).json(result);
+                return;
+            }
+        });
+    }
+    else if(SPONSOR_ID)
+    {
+        const query = `SELECT CONCAT(U2.FNAME, ' ', U2.LNAME) AS AUDIT_DRIVER_FULL_NAME, D.POINTS, A.AUDIT_ID, CONCAT(U1.FNAME, ' ', U1.LNAME) AS USER_FULL_NAME, 
+		                P.AUDIT_POINTS, P.AUDIT_REASON, A.AUDIT_DATE
+                        FROM AuditEntry A
+                        JOIN Users U1 ON U1.USER_ID = A.USER_ID
+                        JOIN POINTAUDIT P ON P.AUDIT_ID = A.AUDIT_ID
+                        JOIN Users U2 ON U2.USER_ID = P.AUDIT_DRIVER 
+                        JOIN DriverSponsorships D ON D.USER_ID = P.AUDIT_DRIVER AND D.SPONSOR_ID = P.AUDIT_SPONSOR
+                        WHERE AUDIT_TYPE LIKE 'POINT CHANGE'
+                        AND P.AUDIT_SPONSOR = ?`
+        connection.query(query,[SPONSOR_ID],(queryError, result)=> {
+            if(queryError){
+                console.error(`Error fetching point tracking:`, queryError);
+                res.status(500).json({ error: 'Internal server error' });
+                return;
+            }
+            else{
+                res.status(200).json(result);
+                return;
+            }
+        });
+    }
+    else if(USER_ID)
+    {
+        const query = `SELECT CONCAT(U2.FNAME, ' ', U2.LNAME) AS AUDIT_DRIVER_FULL_NAME, D.POINTS, A.AUDIT_ID, CONCAT(U1.FNAME, ' ', U1.LNAME) AS USER_FULL_NAME, 
+		                P.AUDIT_POINTS, P.AUDIT_REASON, A.AUDIT_DATE
+                        FROM AuditEntry A
+                        JOIN Users U1 ON U1.USER_ID = A.USER_ID
+                        JOIN POINTAUDIT P ON P.AUDIT_ID = A.AUDIT_ID
+                        JOIN Users U2 ON U2.USER_ID = P.AUDIT_DRIVER 
+                        JOIN DriverSponsorships D ON D.USER_ID = P.AUDIT_DRIVER AND D.SPONSOR_ID = P.AUDIT_SPONSOR
+                        WHERE AUDIT_TYPE LIKE 'POINT CHANGE'
+                        AND P.AUDIT_DRIVER = ?`
+        connection.query(query,[USER_ID],(queryError, result)=> {
+            if(queryError){
+                console.error(`Error fetching point tracking:`, queryError);
+                res.status(500).json({ error: 'Internal server error' });
+                return;
+            }
+            else{
+                res.status(200).json(result);
+                return;
+            }
+        });
+    }
+
+});
+
 // Takes in a new user for the database  
 app.post('/users', (req, res) => {
     const {USER_TYPE, EMAIL, USERNAME, FNAME, LNAME} = req.body;
@@ -719,10 +1172,32 @@ app.post('/admins',(req,res)=> {
         res.json({ message: 'Admin added successfully'});
     })
 })
+app.post('/sponsorcompany', (req, res) => {
+    const { SPONSOR_NAME } = req.body;
 
+    if (!SPONSOR_NAME) {
+        return res.status(400).json({ error: 'Missing required fields' });
+    }
+
+    const companyQuery = `INSERT INTO SponsorCompany (SPONSOR_NAME) VALUES (?)`;
+    connection.query(companyQuery, [SPONSOR_NAME], (error, results) => {
+        if (error) {
+            console.error('Error executing query:', error);
+            return res.status(500).json({ error: 'Internal Server Error' });
+        }
+
+        // Extract the ID of the newly created sponsor company from the results
+        const sponsorCompanyId = results.insertId;
+
+        return res.status(200).json({
+            message: 'Company added successfully',
+            sponsorCompanyId: sponsorCompanyId // Include the sponsor company ID in the response
+        });
+    });
+});
 // Takes in a new sponsor to Sponsors table
 app.post('/sponsors', (req, res) => {
-    const { SPONSOR_ADMIN_ID, SPONSOR_COMPANY_ID, USER_ID} = req.body;
+    const { SPONSOR_ADMIN_ID, SPONSOR_COMPANY_ID, USER_ID, IS_ADMIN} = req.body;
 
     // Check if required fields are provided
     if (!USER_ID || (!SPONSOR_ADMIN_ID && !SPONSOR_COMPANY_ID)) {
@@ -750,7 +1225,7 @@ app.post('/sponsors', (req, res) => {
     else{ // We just take the company id and reassign it
         sponsorId = SPONSOR_COMPANY_ID;
     }
-
+    if(!IS_ADMIN){
     // SQL query to insert data into the Sponsors table
     const insertSponsorQuery = 'INSERT INTO Sponsors (USER_ID, SPONSOR_ID) VALUES (?, ?)';
 
@@ -763,6 +1238,21 @@ app.post('/sponsors', (req, res) => {
 
         res.json({ message: 'Sponsor account created successfully', result: insertResults });
     });
+    }
+    else{
+    // SQL query to insert data into the Sponsors table
+    const insertSponsorQuery = 'INSERT INTO Sponsors (USER_ID, SPONSOR_ID, IS_ADMIN) VALUES (?, ?, 1)';
+
+    // Execute the query to insert new sponsor
+    connection.query(insertSponsorQuery, [USER_ID, sponsorId], (error, insertResults) => {
+        if (error) {
+            console.error('Error inserting sponsor:', error);
+            return res.status(500).json({ error: 'Internal Server Error' });
+        }
+
+        res.json({ message: 'Sponsor account created successfully', result: insertResults });
+    });
+    }
 });
 
 // Takes in a new item to the catalog
@@ -926,6 +1416,70 @@ app.post('/password_change',(req, res)=>{
     });
 
 });
+
+app.post('/order', async (req, res) => {
+    const { USER_ID, SPONSOR_ID, POINT_TOTAL, DOLLAR_AMOUNT, ORDER_ITEMS } = req.body;
+    if (!USER_ID || !SPONSOR_ID || !POINT_TOTAL || !DOLLAR_AMOUNT || !ORDER_ITEMS) {
+      return res.status(400).json({ error: 'MISSING FIELDS' });
+    }
+  
+    try {
+      await new Promise((resolve, reject) => {
+        connection.beginTransaction(error => {
+          if (error) {
+            reject(error);
+          } else {
+            resolve();
+          }
+        });
+      });
+  
+      const ordersql = `INSERT INTO ORDERS(USER_ID, SPONSOR_ID, POINT_TOTAL, DOLLAR_AMOUNT, ORDER_DATE) VALUES (?, ?, ?, ?, CURDATE())`;
+      const orderInsertResult = await new Promise((resolve, reject) => {
+        connection.query(ordersql, [USER_ID, SPONSOR_ID, POINT_TOTAL, DOLLAR_AMOUNT], (error, results) => {
+          if (error) {
+            reject(error);
+          } else {
+            resolve(results);
+          }
+        });
+      });
+      const orderId = orderInsertResult.insertId;
+  
+      // Insert order items into ORDERITEM table
+      const orderItemSql = `INSERT INTO ORDERITEM(ORDER_ID, ITEM_ID) VALUES (?, ?)`;
+      for (const itemId of ORDER_ITEMS) {
+        await new Promise((resolve, reject) => {
+          connection.query(orderItemSql, [orderId, itemId], (error, results) => {
+            if (error) {
+              reject(error);
+            } else {
+              resolve();
+            }
+          });
+        });
+      }
+  
+      await new Promise((resolve, reject) => {
+        connection.commit(error => {
+          if (error) {
+            connection.rollback(() => {
+              reject(error);
+            });
+          } else {
+            resolve();
+          }
+        });
+      });
+  
+      return res.status(200).json({ orderId });
+    } catch (error) {
+      console.error('Error processing order:', error);
+      return res.status(500).json({ error: 'Internal Server Error' });
+    }
+  });
+  
+
 
 // Takes in a new log in attempt for the audit table
 app.post('/login_attempt',(req, res)=>{
