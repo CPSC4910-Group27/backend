@@ -95,7 +95,7 @@ app.get('/ebay', (req, res) =>{
             }).then(response => {
                 if (!response.ok) {
                     console.log(response);
-                    res.status(500).json({error: 'Internal server error'});
+                    return res.status(500).json({error: 'Internal server error'});
                 }
                 return response.json();
             })
