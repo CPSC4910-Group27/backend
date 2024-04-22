@@ -78,43 +78,6 @@ app.get('/admins', (req, res) => {
     })
 })
 
-app.get('/ebay', (req, res) =>{
-
-    const ITEM_ID = req.query.ITEM_ID;
-    const apiUrl = `https://api.ebay.com/buy/browse/v1/item/${ITEM_ID}`;
-    const ebayBase = process.env.EBAY_BASE;
-    const auth = `Bearer ${ebayBase}`;
-            // Define your headers
-            const headers = {
-                'Authorization': auth,
-                'X-EBAY-C-MARKETPLACE-ID': 'EBAY_US',
-                'X-EBAY-C-ENDUSERCTX': 'contextualLocation=country=<2_character_country_code>,zip=<zip_code>,affiliateCampaignId=<ePNCampaignId>,affiliateReferenceId=<referenceId>'
-            };
-            // Make the GET request with fetch
-            fetch(apiUrl, {
-                method: 'GET',
-                headers: headers
-            }).then(response => {
-                if (!response.ok) {
-                    console.log(response);
-                    return res.status(500).json({error: 'Internal server error'});
-                }
-                return response.json();
-            })
-                .then(data => {
-                    console.log(data);
-                    return res.status(200).json(data);
-                })
-            .catch(error => {
-                console.error('There was a problem with your fetch operation:', error);
-                // Check for specific error codes or messages indicating an invalid token
-                if (error.response && error.response.status === 401 && error.response.data && error.response.data.errors && error.response.data.errors[0].message.includes("Invalid access token")) {
-                    return res.status(401).json({error: 'Invalid eBay access token'});
-                } else {
-                    return res.status(500).json({error: 'Internal server error'});
-                }
-            });
-})
 // Gets all users or certain user based on username given
 app.get('/users', (req, res) => {
     const username = req.query.USERNAME;
@@ -909,6 +872,44 @@ app.get('/orders', (req, res) => {
         });
     }
 });
+
+app.get('/ebay', (req, res) =>{
+
+    const ITEM_ID = req.query.ITEM_ID;
+    const apiUrl = `https://api.ebay.com/buy/browse/v1/item/${ITEM_ID}`;
+    const ebayBase = process.env.EBAY_BASE;
+    const auth = `Bearer ${ebayBase}`;
+            // Define your headers
+            const headers = {
+                'Authorization': auth,
+                'X-EBAY-C-MARKETPLACE-ID': 'EBAY_US',
+                'X-EBAY-C-ENDUSERCTX': 'contextualLocation=country=<2_character_country_code>,zip=<zip_code>,affiliateCampaignId=<ePNCampaignId>,affiliateReferenceId=<referenceId>'
+            };
+            // Make the GET request with fetch
+            fetch(apiUrl, {
+                method: 'GET',
+                headers: headers
+            }).then(response => {
+                if (!response.ok) {
+                    console.log(response);
+                    return res.status(500).json({error: 'Internal server error'});
+                }
+                return response.json();
+            })
+                .then(data => {
+                    console.log(data);
+                    return res.status(200).json(data);
+                })
+            .catch(error => {
+                console.error('There was a problem with your fetch operation:', error);
+                // Check for specific error codes or messages indicating an invalid token
+                if (error.response && error.response.status === 401 && error.response.data && error.response.data.errors && error.response.data.errors[0].message.includes("Invalid access token")) {
+                    return res.status(401).json({error: 'Invalid eBay access token'});
+                } else {
+                    return res.status(500).json({error: 'Internal server error'});
+                }
+            });
+})
 
 app.get('/invoices', (req, res) => {
     const SPONSOR_ID = req.query.SPONSOR_ID;
