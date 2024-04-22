@@ -279,8 +279,10 @@ app.get('/drivers', async (req, res) => {
     }
     else if (SPONSOR_ID && USER_ID){
         // RETURNS SPECIFIC DRIVER ASSOCIATED WITH SPECIFIC SPONSOR
-        query = 'SELECT * FROM DriverSponsorships D JOIN Users U on D.USER_ID = U.USER_ID WHERE SPONSOR_ID = ' + SPONSOR_ID.toString() 
-                + 'AND WHERE USER_ID = ' + USER_ID.toString();
+        query = `SELECT S.SPONSOR_ID, SPONSOR_NAME, POINTS
+        FROM DriverSponsorships D
+        JOIN SponsorCompany S ON D.SPONSOR_ID = S.SPONSOR_ID
+        WHERE USER_ID = ${USER_ID} AND SPONSOR_ID = ${SPONSOR_ID}`
         connection.query(query,(queryError, result)=> {
             if(queryError){
                 console.error(`Error fetching drivers associated with ${SPONSOR_ID}:`, queryError);
