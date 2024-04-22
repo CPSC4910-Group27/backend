@@ -1749,7 +1749,7 @@ app.delete('/orders', (req, res) => {
         		}
         		res.status(200).json({ message: `Order with ID ${ORDER_ID} deleted successfully` });
      		 }
-      	}
+      	});
     });
 });
 
