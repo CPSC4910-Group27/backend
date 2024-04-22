@@ -1735,21 +1735,22 @@ app.delete('/orders', (req, res) => {
           res.status(404).json({ error: `Order with ID ${ORDER_ID} not found` });
           return;
         }
-	const sqlTwo = `DELETE FROM ORDERS WHERE ORDER_ID = ${ORDER_ID}`;
-        connection.query(sqlTwo, (queryError, result) => {
-      		if (queryError) {
-        		console.error(`Error deleting order with ID ${ORDER_ID}:`, queryError);
-        		res.status(500).json({ error: 'Internal server error' });
-        		return;
-      		} else {
-        	// Check if any rows were affected (i.e., if item was deleted)
-        		if (result.affectedRows === 0) {
-         		 res.status(404).json({ error: `Order with ID ${ORDER_ID} not found` });
-          		return;
-        		}
-        		res.status(200).json({ message: `Order with ID ${ORDER_ID} deleted successfully` });
-     		 }
-      	});
+        const sqlTwo = `DELETE FROM ORDERS WHERE ORDER_ID = ${ORDER_ID}`;
+            connection.query(sqlTwo, (queryError, result) => {
+                if (queryError) {
+                    console.error(`Error deleting order with ID ${ORDER_ID}:`, queryError);
+                    res.status(500).json({ error: 'Internal server error' });
+                    return;
+                } else {
+                // Check if any rows were affected (i.e., if item was deleted)
+                    if (result.affectedRows === 0) {
+                    res.status(404).json({ error: `Order with ID ${ORDER_ID} not found` });
+                    return;
+                    }
+                    res.status(200).json({ message: `Order with ID ${ORDER_ID} deleted successfully` });
+                }
+            });
+        }
     });
 });
 
