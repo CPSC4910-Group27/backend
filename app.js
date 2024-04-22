@@ -261,8 +261,9 @@ app.get('/sponsoraccounts', async (req, res) => {
 app.get('/drivers', async (req, res) => {
     const SPONSOR_ID = req.query.SPONSOR_ID;
     const USER_ID = req.query.USER_ID;
+    const EMAIL = req.query.EMAIL;
     // RETURN ALL DRIVERS
-    if (!SPONSOR_ID && !USER_ID) {
+    if (!SPONSOR_ID && !USER_ID && !EMAIL) {
         query = 'SELECT * FROM DriverSponsorships D JOIN Users U ON D.USER_ID = U.USER_ID';
         connection.query(query,(queryError, result)=> {
             if(queryError){
@@ -314,6 +315,25 @@ app.get('/drivers', async (req, res) => {
         FROM DriverSponsorships D
         JOIN SponsorCompany S ON D.SPONSOR_ID = S.SPONSOR_ID
         WHERE USER_ID = ${USER_ID}`
+        connection.query(query,(queryError, result)=> {
+            if(queryError){
+                console.error(`Error fetching sponsors associated with ${USER_ID}:`, queryError);
+                res.status(500).json({ error: 'Internal server error' });
+                return;
+            }
+            else{
+                res.status(200).json(result);
+                return;
+            }
+        });
+    }
+    else if (EMAIL){
+        // RETURNS ALL SPONSORS ASSOCIATED WITH SPECIFIC DRIVER
+        query  = `
+        SELECT S.SPONSOR_ID, SPONSOR_NAME, POINTS
+        FROM DriverSponsorships D
+        JOIN SponsorCompany S ON D.SPONSOR_ID = S.SPONSOR_ID
+        WHERE EMAIL = ${EMAIL}`
         connection.query(query,(queryError, result)=> {
             if(queryError){
                 console.error(`Error fetching sponsors associated with ${USER_ID}:`, queryError);
