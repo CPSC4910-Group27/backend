@@ -84,7 +84,7 @@ app.get('/ebay', (req, res) =>{
     const apiUrl = `https://api.ebay.com/buy/browse/v1/item/${ITEM_ID}`;
             // Define your headers
             const headers = {
-                'Authorization': 'Bearer v^1.1#i^1#p^3#r^0#f^0#I^3#t^H4sIAAAAAAAAAOVZf2wbVx2P86Nd+oP9MQYo6g/jsk1qOPvdne3znWpTN3EWL7WT2E63FCLzfPfOfs35zrn3LrEztKWZGELT+gdTKyZA634IRKW161YQkxiIaWIICQZCRYBattHC+gdoUjd+bWhwZyeuG7a2toNmCf9j37vvr8/3p997YGlD/+4HRx/8+1bXxu7jS2Cp2+ViN4P+DX2DH+npHujrAg0EruNLn1rqXe65tIfAolaSUoiUDJ0gd7mo6USqLoY9lqlLBiSYSDosIiJRWUpHE/slzgukkmlQQzY0jzs+HPYgJSezkBc4KHMq4nP2qr4qM2OEPdDPA8DxAAVYXpUF1n5PiIXiOqFQp2EPBzg/A/wMx2Y4TuKCEs95BSF00OM+gEyCDd0m8QJPpGquVOU1G2y9tqmQEGRSW4gnEo+OpMej8eFYMrPH1yArsuKHNIXUIlc/DRkKch+AmoWurYZUqaW0JcuIEI8vUtNwtVApumpMC+ZXXS0GFV4QIRRQwK/6OX5dXDlimEVIr22Hs4IVRq2SSkinmFau51HbG7lDSKYrT0lbRHzY7XxNWlDDKkZm2BPbF52eSsdSHnd6YsI05rGCFAcpF+T8QSEIQrwnkscoj0xRXNFRE7Ti4TVKhgxdwY6/iDtp0H3INhitdQvb4BabaFwfN6MqdYyp03EZAOru8x904lkLoEULuhNSVLR94K4+Xt/5q9lwJf7rlQ+ID4R4vx8obAhClVXePx+cWm8uJyJOWKITEz7HFpSDFaYIzVlESxqUESPb7rWKyMSKxAdUjg+piFGCosr4RVVlcgElyLAqQgChXE4WQ/8nqUGpiXMWRfX0WPuiii/sSctGCU0YGpYrnrUk1U6zkgxlEvYUKC1JPt/CwoJ3gfcaZt7HAcD67knsT8sFVISeOi2+PjGDq2khI5uLYIlWSrY1ZTvrbOV63hPhTWUCmrSSRppmL6zm7FW2RdaufgDIIQ3bHsjYKjoL46hBKFLagqageSyjLFY6CxnHgWBQDDm1DoAAgL8tkJqRx3oC0YLRYTBjiWh8f1vQ7PYJaWeBamhCbGC1CQGWAYIEQFtgo6VSvFi0KMxpKN5hofSLPAixbcErWVan1aEuckTJzykmgG1Bc6auhKEqUWMW6e/bSZ1a/1CxpmIjqVh6NJsZH4sl20KbQqqJSCHjYO20PI1ORu+K2p/EWGBx6sAgryX1O6diuJxJc/fkkX8oMVmcHDflyfm77yr6okkcOMCT0UwqPjU0RwSzvDgfmktGB0NjiXw43JaT0kg2UYe1Lv6Qum80eedoVB4rD8vTeplfnNbnCrERMTpojaUGo0SfFKat8tC+WHvgE/lOq/SVibsO0zbzgSVeB+jU+ocB0qwVZrbahbL2U1tAY/mO69f26BVyAQjZkAqgqLIiVIHI279UBDkBtT9+OwxvAlJaQAsJJmNa8qxtIDORGmYEUeDEoF9mmZCoyCggtpfQpY4L83qNZeLs3v7H0JxabxKeI4PYQmAJe51/Dl7ZKPoMaNGCs5StWu2+ESIfsXd/3tpu35bsNRFUDF2rtMLcBA/W5+39omFWWlFYZ26CB8qyYem0FXUrrE1wqJamYk1zDgVaUdjA3oyZOtQqFMukJZVYd7KNNMFSgpUqQAWTklMvN8RprxWRKSMvVmqHiq0YayJbIayeo7XC1KTKusm6QbGK5ZoMYuWIbOLSjVtRk+PU+rVkteIPYtdCU6GrMdRVtbe9Rgo2kUyzlok7awSsTL5sAmpwllkzB5lZBecX20LueLYTj0wmoun03eOp4bbADaP5TvsnA5GAOCHEMqoMeMYfCPGMKAs5BrIBEXFA4dRcsC3M631O1Hv4ZNugWYHlBT7Eizd8cLJmoeF4+r8uJXxXXwhGuqofdtn1Ilh2/aDb5QJ7wG3sLvDJDT1TvT1bBgimdueGqpfgvA6pZSLvLKqUIDa7b+m6/MTR0aGB2Pix3fdmKr/42stdWxruI4/PgE/UbyT7e9jNDdeTYNuVN33szR/fyvmBn2M5jgvy3EGw68rbXvZjvR+9tPTr17Y//cUHzm//3HLh4Ujq9vCPHwJb60QuV19X77KrC59+afGd7ZGXTv/+Hye/7XnLNeP7fqkPTy8vVh7hj+2f+cPozuRn/3T0mbltQ7fQ58YG7rsp/ar4s7HXNz0J374j9urFe7/xvWN7L2679c1dPV/wyee+u+l01ws9uQQvHdW/lX3vxI6N9+d+3nvi9djmg4c+rZ55dMfXf/i7nsf+jf555Pzli3vP//SmNxJHjtz8K3X28TdOnfnr1ix4Xgj/cedMfM+bj44sn/vOazt++eLl3Sce+8y5F1751+cPP3z2WXXm3d++4y9MLSUfuOPls+8OxE8df+jps091b3jPe+LLF2577uSPHr9Q/uZ9939pfuorX/3NqaXc4FMbH3ly5963X7mg/Xnq0t+WL2xifxL6y5m3Dvcz/ZdG1C21WP4HCcRYXikeAAA=',
+                'Authorization': 'Bearer v^1.1#i^1#r^0#p^3#I^3#f^0#t^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',
                 'X-EBAY-C-MARKETPLACE-ID': 'EBAY_US',
                 'X-EBAY-C-ENDUSERCTX': 'contextualLocation=country=<2_character_country_code>,zip=<zip_code>,affiliateCampaignId=<ePNCampaignId>,affiliateReferenceId=<referenceId>'
             };
@@ -261,9 +261,9 @@ app.get('/sponsoraccounts', async (req, res) => {
 app.get('/drivers', async (req, res) => {
     const SPONSOR_ID = req.query.SPONSOR_ID;
     const USER_ID = req.query.USER_ID;
-    const EMAIL = req.query.EMAIL;
+    
     // RETURN ALL DRIVERS
-    if (!SPONSOR_ID && !USER_ID && !EMAIL) {
+    if (!SPONSOR_ID && !USER_ID) {
         query = 'SELECT * FROM DriverSponsorships D JOIN Users U ON D.USER_ID = U.USER_ID';
         connection.query(query,(queryError, result)=> {
             if(queryError){
@@ -315,25 +315,6 @@ app.get('/drivers', async (req, res) => {
         FROM DriverSponsorships D
         JOIN SponsorCompany S ON D.SPONSOR_ID = S.SPONSOR_ID
         WHERE USER_ID = ${USER_ID}`
-        connection.query(query,(queryError, result)=> {
-            if(queryError){
-                console.error(`Error fetching sponsors associated with ${USER_ID}:`, queryError);
-                res.status(500).json({ error: 'Internal server error' });
-                return;
-            }
-            else{
-                res.status(200).json(result);
-                return;
-            }
-        });
-    }
-    else if (EMAIL){
-        // RETURNS ALL SPONSORS ASSOCIATED WITH SPECIFIC DRIVER
-        query  = `
-        SELECT S.SPONSOR_ID, SPONSOR_NAME, POINTS
-        FROM DriverSponsorships D
-        JOIN SponsorCompany S ON D.SPONSOR_ID = S.SPONSOR_ID
-        WHERE EMAIL = ${EMAIL}`
         connection.query(query,(queryError, result)=> {
             if(queryError){
                 console.error(`Error fetching sponsors associated with ${USER_ID}:`, queryError);
