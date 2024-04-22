@@ -282,7 +282,7 @@ app.get('/drivers', async (req, res) => {
         query = `SELECT S.SPONSOR_ID, SPONSOR_NAME, POINTS
         FROM DriverSponsorships D
         JOIN SponsorCompany S ON D.SPONSOR_ID = S.SPONSOR_ID
-        WHERE USER_ID = ${USER_ID} AND SPONSOR_ID = ${SPONSOR_ID}`
+        WHERE USER_ID = ${USER_ID} AND S.SPONSOR_ID = ${SPONSOR_ID}`
         connection.query(query,(queryError, result)=> {
             if(queryError){
                 console.error(`Error fetching drivers associated with ${SPONSOR_ID}:`, queryError);
