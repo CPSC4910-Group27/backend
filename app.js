@@ -82,9 +82,11 @@ app.get('/ebay', (req, res) =>{
 
     const ITEM_ID = req.query.ITEM_ID;
     const apiUrl = `https://api.ebay.com/buy/browse/v1/item/${ITEM_ID}`;
+    const ebayBase = process.env.EBAY_BASE;
+    const auth = `Bearer ${ebayBase}`;
             // Define your headers
             const headers = {
-                'Authorization': 'Bearer v^1.1#i^1#r^0#p^3#I^3#f^0#t^H4sIAAAAAAAAAOVZa4wbRx0/36sN1yQKISU5odZ1WlVqWHt21971rnIG39kXO4nvfLbzuBORNd6dtfe83nV2Zn3n4wNHhKKACqnUkib0Q0NUIkSkRqCmJUgcEi2tgCIRChIQQKlEeXxAiBY1qRAtu7bjOEebxPahWmK/2Dvzf/3+83/szIDl4XWPHI0dvbredVf/6WWw3O9y0SNg3fDQjg0D/aNDfaCFwHV6+cHlwSMDf9mJYUkriymEy4aOkXuxpOlYrA2OeSxTFw2IVSzqsISwSCQxHU7sFRkvEMumQQzJ0DzueGTMw7AcI3AsqwgcCvI0skf16zIzhj0vBTk/LwDE+RHDKaw9j7GF4jomUCf2PGD8FPBTDJMBQGQ50c96/YHAnMe9H5lYNXSbxAs8oZq5Yo3XbLH11qZCjJFJbCGeUDw8mZ4OxyPRqcxOX4usUMMPaQKJhW9+mzBk5N4PNQvdWg2uUYtpS5IQxh5fqK7hZqFi+LoxHZhfczUr0CxnuxMxgRzgFG5NXDlpmCVIbm2HM6LKlFIjFZFOVFK9nUdtb+TmkUQab1O2iHjE7fzMWFBTFRWZY57oeHh2Xzqa8rjTyaRpVFQZybWg4hg/x3MgyHpCeRXlkSkIDR11QQ0Pr1IyYeiy6vgLu6cMMo5sg9FqtzAtbrGJpvVpM6wQx5hWOqbpPjDnrGd9AS1S0J0lRSXbB+7a6+2dfz0abqz/msUDnUOSJCsQBgHL5ND7x4OT6+3FRMhZlnAy6XNsQTlYpUrQLCJS1qCEKMl2r1VCpiqLbEBh2KCCKJkTFMovKAqVC8gcRSsIAYRyOUkI/p+EBiGmmrMIaobH6okavjFPWjLKKGloqlT1rCapVZpGMCziMU+BkLLo8y0sLHgXWK9h5n0MALTvYGJvWiqgEvQ0adXbE1NqLSwkO0psepFUy7Y1i3bU2cr1vCfEmnISmqSaRppmD1yP2ZtsC60e/QCQE5pqeyBjq+gtjDEDEyR3BU1GFVVCWVXuLWQMAzhOCDq5DgAPgL8rkJqRV/UEIgWjx2BGE+H43q6g2eUTkt4C1SwudIbmG0WI5WkK8CIAXYENl8vxUskiMKeheI8tpV9gQZDuCl7ZsnotD3WBwXL+sGwC2BU0p+uKKlREYhSR/r6V1Mn1DxVrKjqZiqZj2cz0nuhUV2hTSDERLmQcrL0Wp+GZ8O6w/SR2z8TjzMFiIhfzC/NspZS2cDhyeGrXkjK/S8/ko5WFqTkDzlY4zGXo1GSFLXCV8m7fvtySusu/ECMLY2NdOSmNJBP1WOli55Xx2NSuWFjasxiRZvVFdmlWP1yITgrhHdae1I4w1mf4WWtxYjzaHfhEvtcyvdFx16DbZj4wxZsAnVz/MECa9cTM1qpQ1n7rCmg033P12m69fC4AIR1UABQUWoAKEFj7n4Igw6Pu22+P4U1AQgpoIUFlTEsq2gZSyVSE4gWeETi/RFNBQZZQQOguoMs9t8xr1Zaxs3v7H0Nzcr1NeI4MbAuBZdXrfDl4JaPkM6BFCs5Qtma1+06IfNje/Xnru31bstdEUDZ0rdoJcxs8ql6x94uGWe1EYZO5DR4oSYalk07UNVjb4FAsTVE1zTkU6ERhC3s7ZupQqxJVwh2pVHUn2nAbLGVYrQGUVVx28uWOOO2xEjIl5FXl+qFiJ8aayFYIa+donTC1qbJpsm4QVVGlugxs5bBkquU7t6Iux8n1W8nqxB/YzoW2lq7O0FTV3fYayaqJJJK1TLW3WkCj82UTUINFalUfpIqyml/qCrnj2V48MkmG0+kD06lIV+AiqNJrXzIQ8YjhgzSlSICl/IEgSwkSn6MgHRAQA2RGyXFdYV7rc6LBzz/bNWiap1nezzGAuVNoqwZajqf/61LCd/OFYKiv9tBHXD8ER1wr/S4X2AkeoreDB4YH9g0O3DOKVWJXbqh4sZrXIbFM5C2iahmqZv/mvjfPfDU2MRqdPvHIZzPVnz/1St89LfeRpw+Brc0byXUD9EjL9ST4xI2ZIXrjx9czfuC3N1uA5fzsHNh+Y3aQvnfwYxef/93IsRPf+tXWzxT4Jze8sPT8lT/OgfVNIpdrqG/wiKuv+vVLr/SvbJ45fnnk8HtnTz/x8KN7Nj19cdvk49Jfn/2GfmV824v5A5mXAht/enG4fPxzW4Z2vyg+PLpX479z7dfn7t02cPmjpz4VePtPO/GM98KX/n3u9/jHj0++c9ZD3Zf92muXs2+dOvn6xRP/9Jz8w8aXRg9sn/jywfN3r7C5Y6/GIo+996PXKn+OBd68ev+ZC+/uKH7lJ/+ofHrLpgef23rh0ZffuHbqZ8UNy89NnpveEvrbpWv/OnP1wpWhjzw2Nf+9B545v/+Th95aWX/pl3dvfPXYF0JPu6u/YfDWbz/07sgvfnD20G+Dx+/7/rn7r25G8OTwE96JN44exU8N/f2L78AX7vpmdvN3i7m3F6dfpl9feea88GRyZlN9Lf8DZKS/YSkeAAA=',
+                'Authorization': auth,
                 'X-EBAY-C-MARKETPLACE-ID': 'EBAY_US',
                 'X-EBAY-C-ENDUSERCTX': 'contextualLocation=country=<2_character_country_code>,zip=<zip_code>,affiliateCampaignId=<ePNCampaignId>,affiliateReferenceId=<referenceId>'
             };
@@ -103,9 +105,14 @@ app.get('/ebay', (req, res) =>{
                     console.log(data);
                     return res.status(200).json(data);
                 })
-                .catch(error => {
-                    console.error('There was a problem with your fetch operation:', error);
+            .catch(error => {
+                console.error('There was a problem with your fetch operation:', error);
+                // Check for specific error codes or messages indicating an invalid token
+                if (error.response && error.response.status === 401 && error.response.data && error.response.data.errors && error.response.data.errors[0].message.includes("Invalid access token")) {
+                    return res.status(401).json({error: 'Invalid eBay access token'});
+                } else {
                     return res.status(500).json({error: 'Internal server error'});
+                }
             });
 })
 // Gets all users or certain user based on username given
