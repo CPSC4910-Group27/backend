@@ -1698,6 +1698,61 @@ app.delete('/drivers/:USER_ID/:SPONSOR_ID', (req, res) => {
     });
 });
 
+app.delete('/catalog', (req, res) => {
+    const ITEM_ID = req.query.ITEM_ID;
+  
+    // Perform the delete operation in the database
+    const sql = `DELETE FROM CATALOG WHERE ITEM_ID = ${ITEM_ID}`;
+    connection.query(sql, (queryError, result) => {
+      if (queryError) {
+        console.error(`Error deleting item with ID ${ITEM_ID}:`, queryError);
+        res.status(500).json({ error: 'Internal server error' });
+        return;
+      } else {
+        // Check if any rows were affected (i.e., if item was deleted)
+        if (result.affectedRows === 0) {
+          res.status(404).json({ error: `Item with ID ${ITEM_ID} not found` });
+          return;
+        }
+        res.status(200).json({ message: `Item with ID ${ITEM_ID} deleted successfully` });
+      }
+    });
+});
+
+app.delete('/orders', (req, res) => {
+    const ORDER_ID = req.query.ORDER_ID;
+  
+    // Perform the delete operation in the database
+    const sql = `DELETE FROM ORDERITEM WHERE ORDER_ID = ${ORDER_ID}`;
+    connection.query(sql, (queryError, result) => {
+      if (queryError) {
+        console.error(`Error deleting order with ID ${ORDER_ID}:`, queryError);
+        res.status(500).json({ error: 'Internal server error' });
+        return;
+      } else {
+        // Check if any rows were affected (i.e., if item was deleted)
+        if (result.affectedRows === 0) {
+          res.status(404).json({ error: `Order with ID ${ORDER_ID} not found` });
+          return;
+        }
+	const sqlTwo = `DELETE FROM ORDERS WHERE ORDER_ID = ${ORDER_ID}`;
+        connection.query(sqlTwo, (queryError, result) => {
+      		if (queryError) {
+        		console.error(`Error deleting order with ID ${ORDER_ID}:`, queryError);
+        		res.status(500).json({ error: 'Internal server error' });
+        		return;
+      		} else {
+        	// Check if any rows were affected (i.e., if item was deleted)
+        		if (result.affectedRows === 0) {
+         		 res.status(404).json({ error: `Order with ID ${ORDER_ID} not found` });
+          		return;
+        		}
+        		res.status(200).json({ message: `Order with ID ${ORDER_ID} deleted successfully` });
+     		 }
+      	}
+    });
+});
+
 // HOME PAGE 
 app.get('/', (req, res) => {
   res.send('Hello, Express!');
